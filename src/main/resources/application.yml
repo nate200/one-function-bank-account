@@ -1,0 +1,18 @@
+spring:
+  config:
+    import: optional:not-secret-application.yml
+  jpa:
+    database: POSTGRESQL
+    show-sql: true
+      #hibernate:
+    #ddl-auto: create-drop
+  datasource:
+    platform: postgres
+    driverClassName: org.postgresql.Driver
+    url: postgres-url and port
+    username: your postgres username
+    password: password ;)
+
+exchangerate-api:
+  apikey: apikey from the dashboard ;))))
+  convert-endpoint: https://v6.exchangerate-api.com/v6/${exchangerate-api.apikey}/pair/
