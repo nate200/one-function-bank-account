@@ -1,9 +1,12 @@
 package simple.account.demo.model;
 
-import jakarta.annotation.Nonnull;
 import jakarta.persistence.*;
 
+import jakarta.validation.constraints.DecimalMin;
+import jakarta.validation.constraints.Min;
+import jakarta.validation.constraints.NotNull;
 import lombok.*;
+import org.hibernate.annotations.ColumnDefault;
 
 import java.math.BigDecimal;
 
@@ -14,8 +17,11 @@ public class Account {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     Long id;
+
+    @Min(0)
     BigDecimal total;
-    @Nonnull
+
+    @NotNull
     String currency;
 }
 

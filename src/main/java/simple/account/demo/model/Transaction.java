@@ -1,26 +1,26 @@
 package simple.account.demo.model;
 
-import jakarta.annotation.Nonnull;
 import jakarta.persistence.*;
+import jakarta.validation.constraints.NotNull;
 import lombok.*;
 
 import java.math.BigDecimal;
 
 @Entity
 @Table(name = "TRANSACTION")
-@Getter @Setter @AllArgsConstructor @NoArgsConstructor @ToString
+@Getter @Setter @AllArgsConstructor @NoArgsConstructor @ToString @Builder
 public class Transaction {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "transaction_id")
     Long transactionId;
 
-    @Nonnull String currency;
+    @NotNull String currency;
     @Column(name = "from_acc")
-    @Nonnull Long fromAcc;
+    @NotNull Long fromAcc;
     @Column(name = "to_acc")
-    @Nonnull Long toAcc;
-    @Nonnull BigDecimal amount;
+    @NotNull Long toAcc;
+    @NotNull BigDecimal amount;
 }
 /*
 CREATE TABLE TRANSACTION (
