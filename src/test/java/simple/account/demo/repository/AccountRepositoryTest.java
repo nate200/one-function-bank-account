@@ -37,10 +37,15 @@ class AccountRepositoryTest {
     @PersistenceContext
     EntityManager entityManager;//https://stackoverflow.com/questions/52857963/how-to-test-method-from-repository-which-marked-as-modifying
 
-    final List<Account> ACCOUNTS = List.of(
-        new Account(null, TEN, "THB"),
-        new Account(null, BigDecimal.valueOf(50000.0), "USD")
-    );
+    List<Account> ACCOUNTS;
+
+    @BeforeEach
+    void setupAccounts(){
+        ACCOUNTS = List.of(
+            new Account(null, TEN, "THB"),
+            new Account(null, BigDecimal.valueOf(50000.0), "USD")
+        );
+    }
 
     @Test
     void test_Autowired(){
