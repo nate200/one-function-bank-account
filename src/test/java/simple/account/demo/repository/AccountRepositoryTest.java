@@ -14,12 +14,14 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.transaction.annotation.Transactional;
 import simple.account.demo.model.Account;
+import simple.account.demo.model.Transaction;
 
 import java.math.BigDecimal;
 import java.util.Collections;
 import java.util.List;
 import java.util.Set;
 
+import static java.math.BigDecimal.*;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.comparesEqualTo;
 import static org.junit.jupiter.api.Assertions.*;
@@ -36,7 +38,7 @@ class AccountRepositoryTest {
     EntityManager entityManager;//https://stackoverflow.com/questions/52857963/how-to-test-method-from-repository-which-marked-as-modifying
 
     final List<Account> ACCOUNTS = List.of(
-        new Account(null, BigDecimal.TEN, "THB"),
+        new Account(null, TEN, "THB"),
         new Account(null, BigDecimal.valueOf(50000.0), "USD")
     );
 
@@ -49,7 +51,7 @@ class AccountRepositoryTest {
     void test_insert_null_to_NonNull(){
         jakarta.validation.ConstraintViolationException error = assertThrows(
                 jakarta.validation.ConstraintViolationException.class,
-            () -> accountRepo.save(new Account(null,BigDecimal.TEN,null)),
+            () -> accountRepo.save(new Account(null,TEN,null)),
             "Expected ConstraintViolationException.class"
         );
 
@@ -60,6 +62,20 @@ class AccountRepositoryTest {
     void test_insertSuccess(){
         accountRepo.saveAll(ACCOUNTS);
         assertTrue(ACCOUNTS.size() <= accountRepo.count());
+    }
+
+    @Test
+    void test_insert() {
+        Account acc = new Account(null, ZERO, "THB");
+        entityManager.persist(acc);
+
+        accountRepo.save(new Account(null, acc.getTotal(), acc.getCurrency()));
+        List<Account> accounts = accountRepo.findAll();
+
+        assertEquals(2,accounts.size());
+        Account account = accounts.get(0);
+        assertEquals(acc.getTotal(),account.getTotal());
+        assertEquals(acc.getCurrency(),account.getCurrency());
     }
 
     @Test
@@ -114,11 +130,11 @@ class AccountRepositoryTest {
         List<Account> accs = accountRepo.findAll();
         long delAccId = accs.get(0).getId();
 
-        int affectedRows = accountRepo.changeTotal(BigDecimal.ONE, delAccId);
+        int affectedRows = accountRepo.changeTotal(ONE, delAccId);
         assertEquals(1, affectedRows);
 
         accountRepo.deleteById(delAccId);
-        affectedRows = accountRepo.changeTotal(BigDecimal.ONE, delAccId);
+        affectedRows = accountRepo.changeTotal(ONE, delAccId);
         assertEquals(0, affectedRows);
     }
 
