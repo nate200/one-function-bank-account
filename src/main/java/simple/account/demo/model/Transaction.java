@@ -21,6 +21,7 @@ public class Transaction {
     @Column(name = "to_acc")
     @NotNull Long toAcc;
     @NotNull BigDecimal amount;
+    @NotNull String transaction_result;
 }
 /*
 CREATE TABLE TRANSACTION (
