@@ -29,22 +29,9 @@ public class ExchangeRateApi {
             return amount;
 
         String url_str = CONVERT_ENDPOINT + base + "/" + target + "/" + amount;
+        JsonObject jsonObject = ConnectionUtil.getJsonObjFromUrl(url_str);
 
-        URL url = new URL(url_str);
-        HttpURLConnection request = (HttpURLConnection) url.openConnection();
-        request.connect();
-
-        BigDecimal result;
-        try (
-            InputStream is = (InputStream) request.getContent();
-            InputStreamReader inr = new InputStreamReader(is)
-        ) {
-            JsonElement jsonElement = JsonParser.parseReader(inr);
-            JsonObject jsonObject = jsonElement.getAsJsonObject();
-            result = jsonObject.get("conversion_result").getAsBigDecimal();
-        }
-
-        return result;
+        return jsonObject.get("conversion_result").getAsBigDecimal();
     }
     private void checkIfCurrencyValid(String currency){
         try{ Currency.getInstance(currency); }
@@ -54,6 +41,7 @@ public class ExchangeRateApi {
     }
     private void checkIfAmountValid(BigDecimal amount){
         if(amount == null || BigDecimal.ZERO.compareTo(amount) >= 0)
-            throw new IllegalArgumentException("The exchange amount must be greater than 0");
+            throw new IllegalArgumentException("The exchange amount must be decimal and greater than 0");
     }
+
 }
