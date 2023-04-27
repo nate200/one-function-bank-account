@@ -1,16 +1,12 @@
-package simple.account.demo.service.account;
+package simple.account.demo.service;
 
 import jakarta.persistence.EntityNotFoundException;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.junit.jupiter.params.provider.MethodSource;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.mockito.junit.jupiter.MockitoSettings;
-import simple.account.demo.common.ExchangeRateApi;
 import simple.account.demo.model.Account;
-import simple.account.demo.model.Transaction;
 import simple.account.demo.repository.AccountRepository;
 
 import java.math.BigDecimal;
@@ -40,7 +36,7 @@ class AccountServiceTest {
     @Mock
     AccountRepository repo;
     @InjectMocks
-    AccountServiceImpl service;
+    AccountService service;
 
     @Test
     void save_one_account(){

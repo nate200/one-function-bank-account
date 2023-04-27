@@ -1,20 +1,15 @@
 package simple.account.demo.common;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.math.BigDecimal;
-import java.net.HttpURLConnection;
-import java.net.URL;
-import java.util.Currency;
 
-import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
-import com.google.gson.JsonParser;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 
-@AllArgsConstructor
+import java.io.IOException;
+import java.math.BigDecimal;
+import java.util.Currency;
+
 @Getter
+@AllArgsConstructor
 public class ExchangeRateApi {
 
     final String CONVERT_ENDPOINT;

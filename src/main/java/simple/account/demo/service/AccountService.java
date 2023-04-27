@@ -1,24 +1,17 @@
-package simple.account.demo.service.account;
+package simple.account.demo.service;
 
 import jakarta.persistence.EntityNotFoundException;
-import lombok.AllArgsConstructor;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
-import simple.account.demo.common.ExchangeRateApi;
 import simple.account.demo.model.Account;
-import simple.account.demo.model.Transaction;
 import simple.account.demo.repository.AccountRepository;
-import simple.account.demo.repository.TransactionRepository;
 
-import java.io.IOException;
 import java.math.BigDecimal;
 import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
-public class AccountServiceImpl implements AccountService {
+public class AccountService {
     AccountRepository accountRepo;
 
     public Account saveAccount(Account account) {
