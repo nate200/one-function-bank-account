@@ -2,17 +2,17 @@ package simple.account.demo.model;
 
 import jakarta.persistence.*;
 
-import jakarta.validation.constraints.DecimalMin;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotNull;
 import lombok.*;
-import org.hibernate.annotations.ColumnDefault;
 
 import java.math.BigDecimal;
 
+@Data
+@AllArgsConstructor
+
 @Entity
 @Table(name = "account")
-@Getter @Setter @AllArgsConstructor @NoArgsConstructor @ToString
 public class Account {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -31,6 +31,6 @@ public class Account {
     currency VARCHAR ( 10 ) NOT NULL
 );
 
-INSERT INTO ACCOUNT VALUES(1,50.0,'THB');
-INSERT INTO ACCOUNT VALUES(2,50000.0,'USD');
+INSERT INTO ACCOUNT(id, total, currency) VALUES(1,50.0,'THB');
+INSERT INTO ACCOUNT(id, total, currency) VALUES(2,50000.0,'USD');
 */

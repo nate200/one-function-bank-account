@@ -6,9 +6,12 @@ import lombok.*;
 
 import java.math.BigDecimal;
 
+@Data
+@AllArgsConstructor
+@Builder(toBuilder=true)
+
 @Entity
 @Table(name = "TRANSACTION")
-@Getter @Setter @AllArgsConstructor @NoArgsConstructor @ToString @Builder
 public class Transaction {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
