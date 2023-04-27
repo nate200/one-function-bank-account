@@ -22,6 +22,7 @@ public class Transaction {
     @NotNull Long toAcc;
     @NotNull BigDecimal amount;
     @NotNull String transaction_result;
+    @NotNull String transaction_result_reason;
 }
 /*
 CREATE TABLE TRANSACTION (

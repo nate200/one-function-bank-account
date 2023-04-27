@@ -32,7 +32,7 @@ class TransactionRepositoryTest {
 
     @Test
     void test_insert() {
-        Transaction tm = new Transaction(null, "THB", 1L, 2L, ZERO, "done");
+        Transaction tm = new Transaction(null, "THB", 1L, 2L, ZERO, "done", "OKIE DOKIE");
         em.persist(tm);
 
         transactionRepo.save(Transaction.builder()
@@ -40,7 +40,8 @@ class TransactionRepositoryTest {
             .fromAcc(tm.getFromAcc())
             .toAcc(tm.getToAcc())
             .amount(tm.getAmount())
-            .transaction_result(tm.getTransaction_result()).build()
+            .transaction_result(tm.getTransaction_result())
+            .transaction_result_reason(tm.getTransaction_result_reason()).build()
         );
         List<Transaction> transactions = transactionRepo.findAll();
 
@@ -66,11 +67,12 @@ class TransactionRepositoryTest {
 
     static Stream<Transaction> invalidTransactionData() {
         return Stream.of(
-            new Transaction(null,null, 1L, 2L, ZERO, "done"),
-            new Transaction(null,"THB", null, 2L, ZERO, "done"),
-            new Transaction(null,"THB", 1L, null, ZERO, "done"),
-            new Transaction(null,"THB", 1L, 2L, null, "done"),
-            new Transaction(null,"THB", 1L, 2L, ZERO, null)
+            new Transaction(null,null, 1L, 2L, ZERO, "done", "OKIE DOKIE"),
+            new Transaction(null,"THB", null, 2L, ZERO, "done", "OKIE DOKIE"),
+            new Transaction(null,"THB", 1L, null, ZERO, "done", "OKIE DOKIE"),
+            new Transaction(null,"THB", 1L, 2L, null, "done", "OKIE DOKIE"),
+            new Transaction(null,"THB", 1L, 2L, ZERO, null, "OKIE DOKIE"),
+            new Transaction(null,"THB", 1L, 2L, ZERO, "done", null)
         );
     }
 }
