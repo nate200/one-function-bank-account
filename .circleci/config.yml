@@ -1,0 +1,35 @@
+version: 2.1
+
+jobs:
+  maven-build-test:
+    docker:
+      - image: cimg/openjdk:17.0.7
+      - image: cimg/postgres:15.2
+        environment:
+            POSTGRES_USER: postgres #no wonder why many tutorials and the official document don't use Environment Variables for username
+            POSTGRES_PASSWORD: $POSTGRESDB_TEST_PASS
+            POSTGRES_DB: test
+    steps:
+      - checkout
+      - restore_cache:
+          keys:
+          - pom-cache-{{ checksum "pom.xml" }}
+      - run:
+          name: Build
+          command: mvn -B -DskipTests clean package
+      - save_cache:
+          key: pom-cache-{{ checksum "pom.xml" }}
+          paths:
+            - ~/.m2
+      - run:
+          name: Test
+          command: mvn test
+
+workflows:
+  maven-workflow:
+    jobs:
+      - maven-build-test:
+          pre-steps:
+              - run:
+                  name: Wait for db
+                  command: dockerize -wait tcp://localhost:5432 -timeout 1m
