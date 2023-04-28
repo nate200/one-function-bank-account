@@ -13,17 +13,17 @@ jobs:
       - checkout
       - restore_cache:
           keys:
-          - pom-cache-{{ checksum "pom.xml" }}
+          - v1-pom-cache-{{ checksum "pom.xml" }}
       - run:
           name: Build
           command: mvn -B -DskipTests clean package
-      - save_cache:
-          key: pom-cache-{{ checksum "pom.xml" }}
-          paths:
-            - ~/.m2
       - run:
           name: Test
           command: mvn test
+      - save_cache:
+         key: v1-pom-cache-{{ checksum "pom.xml" }}
+         paths:
+           - ~/.m2
 
 workflows:
   maven-workflow:
