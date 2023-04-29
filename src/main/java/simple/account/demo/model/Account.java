@@ -20,6 +20,7 @@ public class Account {
     Long id;
 
     @Min(0)
+    @NotNull
     BigDecimal total;
 
     @NotNull
