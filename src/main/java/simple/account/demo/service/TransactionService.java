@@ -14,4 +14,12 @@ public class TransactionService {
     public Transaction saveTransaction(@NonNull Transaction transaction){
         return transactionRepo.save(transaction);
     }
+
+    public void updateStatus(@NonNull Transaction transaction){
+        transactionRepo.updateStatus(
+            transaction.getTransaction_status(),
+            transaction.getTransaction_result(),
+            transaction.getTransactionId()
+        );
+    }
 }
