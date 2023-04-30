@@ -1,6 +1,7 @@
 package simple.account.demo.service;
 
 import jakarta.persistence.EntityNotFoundException;
+import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import simple.account.demo.model.Account;
@@ -14,7 +15,7 @@ import java.util.Optional;
 public class AccountService {
     AccountRepository accountRepo;
 
-    public Account saveAccount(Account account) {
+    public Account saveAccount(@NonNull Account account) {
         Optional<Account> savedAcc = accountRepo.findById(account.getId());
         if(savedAcc.isPresent())
             throw new IllegalArgumentException("Account already exist with given Id:" + account.getId());
@@ -31,7 +32,7 @@ public class AccountService {
         return getAccountById(accId).getCurrency();
     }
 
-    public void changeTotal(BigDecimal amount, long accId){
+    public void changeTotal(@NonNull BigDecimal amount, long accId){
         int rowAffected = accountRepo.changeTotal(amount, accId);
         if(rowAffected == 0)
             throw throwAccountNotFound(accId);

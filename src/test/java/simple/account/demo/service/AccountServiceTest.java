@@ -7,6 +7,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import simple.account.demo.model.Account;
+import simple.account.demo.model.Transaction;
 import simple.account.demo.repository.AccountRepository;
 
 import java.math.BigDecimal;
@@ -50,7 +51,15 @@ class AccountServiceTest {
         verify(repo, times(1)).save(any(Account.class));
     }
     @Test
-    void saveAccount_fail_saving_duplicate_id(){
+    void saveAccount_null(){
+        assertThrows(
+                NullPointerException.class,
+                () -> service.saveAccount(null)
+        );
+        verify(repo, never()).save(any(Account.class));
+    }
+    @Test
+    void saveAccount_already_exist(){
         Account acc = new Account(1L, ZERO, "THB");
         given(repo.findById(anyLong())).willReturn(Optional.of(acc));
         /*force [... = accountRepo.findById(account.getId());] in service.saveAccount(...) to return Optional,
@@ -117,6 +126,14 @@ class AccountServiceTest {
         service.changeTotal(TEN, DEFAULT_ID);
 
         verify(repo, times(1)).changeTotal(any(BigDecimal.class), anyLong());
+    }
+    @Test
+    void changeTotal_null_amount(){
+        assertThrows(
+                NullPointerException.class,
+                () -> service.changeTotal(null, DEFAULT_ID)
+        );
+        verify(repo, never()).changeTotal(any(BigDecimal.class), anyLong());
     }
     @Test
     void changeTotal_non_exist_account(){
