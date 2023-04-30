@@ -47,11 +47,10 @@ public class TransferManager {
         System.out.println("transaction: " + transaction);
 
         Currency currencyTran = CurrencyUtil.getCurrencyFromString(transaction.getCurrency());
-        BigDecimal amount = transaction.getAmount();//ex: INR -> USD -> CND
-
         Currency currencyFrom = getAccountCurrency(transaction.getFromAcc());
         Currency currencyTo = getAccountCurrency(transaction.getToAcc());
 
+        BigDecimal amount = transaction.getAmount();//ex: INR -> USD -> CND
         BigDecimal convertedWithdraw = exchangeApi.convert(currencyTran, currencyFrom, amount);
         BigDecimal convertedTransfer = exchangeApi.convert(currencyTran, currencyTo, amount);
 

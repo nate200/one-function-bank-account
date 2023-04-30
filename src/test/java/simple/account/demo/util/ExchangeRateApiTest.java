@@ -10,6 +10,7 @@ import org.junit.jupiter.params.provider.MethodSource;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockedStatic;
+import org.mockito.internal.matchers.Null;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.math.BigDecimal;
@@ -64,7 +65,7 @@ public class ExchangeRateApiTest {
     @MethodSource("invalidCurrenciesSet")
     void test_convert_invalidCurrencyParameter(Currency invalidCurrencyBase, Currency invalidCurrencyTarget) throws Exception {
         assertThrows(
-            IllegalArgumentException.class,
+            NullPointerException.class,
             () -> exchangeRateApi.convert(invalidCurrencyBase, invalidCurrencyTarget, BigDecimal.TEN)
         );
         verify(request, never()).getInputStream();

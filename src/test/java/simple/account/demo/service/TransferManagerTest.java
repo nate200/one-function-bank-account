@@ -70,20 +70,22 @@ class TransferManagerTest {
 
     @Test
     void account_with_invalid_currency() throws Exception {
-        given(accountService.getAccountRawCurrency(anyLong())).willReturn("LOLOLOLOLOL");
+        given(accountService.getAccountRawCurrency(DEFAULT_TRANSACTION.getFromAcc())).willReturn("LOLOLOLOLOL");
 
         assertThrows(
                 Exception.class,
                 () -> transferManager.transferWithInApp(DEFAULT_TRANSACTION)
         );
 
-        verify(exchangeApi, times(1)).convert(any(Currency.class), any(Currency.class), any(BigDecimal.class));
+        verifyNoInteractions(exchangeApi);
         verify(accountService, never()).changeTotal(any(BigDecimal.class), anyLong());
         verify(transactionService, times(1)).updateStatus(any(Transaction.class));
     }
 
     @Test
     void exchangeApi_io_problem() throws Exception {
+        given(accountService.getAccountRawCurrency(DEFAULT_TRANSACTION.getFromAcc())).willReturn("CHF");
+        given(accountService.getAccountRawCurrency(DEFAULT_TRANSACTION.getToAcc())).willReturn("THB");
         given(exchangeApi.convert(any(Currency.class), any(Currency.class), any(BigDecimal.class))).willThrow(new IOException());
 
         assertThrows(
