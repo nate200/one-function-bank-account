@@ -6,6 +6,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import simple.account.demo.exception.BadRequestParameterException;
 import simple.account.demo.model.Account;
 import simple.account.demo.repository.AccountRepository;
 
@@ -43,7 +44,7 @@ class AccountServiceTest {
     void saveAccount(){
         given(repo.save(any(Account.class))).willReturn(DEFAULT_ACCOUNT);
 
-        service.createAccount(DEFAULT_ACCOUNT);
+        service.createAccountRequest(DEFAULT_ACCOUNT);
 
         verify(repo, times(1)).save(any(Account.class));
     }
@@ -51,7 +52,7 @@ class AccountServiceTest {
     void saveAccount_null(){
         assertThrows(
                 NullPointerException.class,
-                () -> service.createAccount(null)
+                () -> service.createAccountRequest(null)
         );
         verify(repo, never()).save(any(Account.class));
     }
@@ -61,8 +62,8 @@ class AccountServiceTest {
         given(repo.findByEmail(any(String.class))).willReturn(Optional.of(savedAcc));
 
         assertThrows(
-            IllegalArgumentException.class,
-            () -> service.createAccount(DEFAULT_ACCOUNT)
+            BadRequestParameterException.class,
+            () -> service.createAccountRequest(DEFAULT_ACCOUNT)
         );
 
         verify(repo, never()).save(any(Account.class));

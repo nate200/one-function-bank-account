@@ -1,9 +1,11 @@
 package simple.account.demo.service;
 
 import jakarta.persistence.EntityNotFoundException;
+import jakarta.validation.ConstraintViolationException;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import simple.account.demo.exception.BadRequestParameterException;
 import simple.account.demo.model.Account;
 import simple.account.demo.repository.AccountRepository;
 
@@ -15,12 +17,13 @@ import java.util.Optional;
 public class AccountService {
     AccountRepository accountRepo;
 
-    public Account createAccount(@NonNull Account account) {
+    public void createAccountRequest(@NonNull Account account) {
         Optional<Account> savedAcc = accountRepo.findByEmail(account.getEmail());
         if(savedAcc.isPresent())
-            throw new IllegalArgumentException("Account already exist with given Id:" + account.getId());
+            throw new BadRequestParameterException("Account with email[" + account.getEmail() + "] is already exist");
 
-        return accountRepo.save(account);
+        accountRepo.save(account);
+        System.out.println("yes");
     }
 
     public Account getAccountById(long accId) {
