@@ -54,23 +54,6 @@ class AccountRepositoryTest {
         assertThat(error.getMessage()).contains("must not be null");
     }
 
-
-    @Test
-    void findCurrencyById() {
-        String expectedCurrency = "CHF";
-        Account acc = accountRepo.save(new Account(null, ZERO, expectedCurrency));
-
-        String currency = accountRepo.findCurrencyById(acc.getId());
-
-        assertEquals(expectedCurrency, currency);
-    }
-    @Test
-    void findCurrency_of_non_exist_account() {
-        String currency = accountRepo.findCurrencyById(Long.MAX_VALUE);
-        assertNull(currency);
-    }
-
-
     @ParameterizedTest
     @MethodSource("validTransaction")
     @Transactional

@@ -22,8 +22,4 @@ public interface AccountRepository extends JpaRepository<Account, Long> {
         @Param("amount") BigDecimal amount,
         @Param("accId") long accId
     );
-
-    @Cacheable(key="#accId", value="currencyyyyyyy")//must have key + value
-    @Query("select currency from Account WHERE id = :accId")
-    String findCurrencyById(@Param("accId") long accId);
 }
