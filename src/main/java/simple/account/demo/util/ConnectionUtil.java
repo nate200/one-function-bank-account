@@ -1,4 +1,4 @@
-package simple.account.demo.common;
+package simple.account.demo.util;
 
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;

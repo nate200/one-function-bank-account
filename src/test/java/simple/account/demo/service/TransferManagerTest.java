@@ -8,11 +8,12 @@ import org.junit.jupiter.params.provider.MethodSource;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import simple.account.demo.common.ExchangeRateApi;
+import simple.account.demo.util.ExchangeRateApi;
 import simple.account.demo.model.Transaction;
 
 import java.io.IOException;
 import java.math.BigDecimal;
+import java.util.Currency;
 import java.util.stream.Stream;
 
 import static java.math.BigDecimal.*;
@@ -34,7 +35,7 @@ class TransferManagerTest {
     @Test
     void transferToWithInApp_success() throws Exception {
         given(accountService.getAccountCurrency(anyLong())).willReturn("CHF");
-        given(exchangeApi.convert(any(String.class), any(String.class), any(BigDecimal.class))).willReturn(TEN);
+        given(exchangeApi.convert(any(Currency.class), any(Currency.class), any(BigDecimal.class))).willReturn(TEN);
         doNothing().when(accountService).changeTotal(any(BigDecimal.class), anyLong());
 
         transferManager.transferWithInApp(DEFAULT_TRANSACTION);
@@ -68,7 +69,7 @@ class TransferManagerTest {
     }
 
     @Test
-    void account_with_invalid_currency() throws IOException {
+    void account_with_invalid_currency() throws Exception {
         given(accountService.getAccountCurrency(anyLong())).willReturn("LOLOLOLOLOL");
 
         assertThrows(
@@ -76,14 +77,14 @@ class TransferManagerTest {
                 () -> transferManager.transferWithInApp(DEFAULT_TRANSACTION)
         );
 
-        verify(exchangeApi, times(1)).convert(any(String.class), any(String.class), any(BigDecimal.class));
+        verify(exchangeApi, times(1)).convert(any(Currency.class), any(Currency.class), any(BigDecimal.class));
         verify(accountService, never()).changeTotal(any(BigDecimal.class), anyLong());
         verify(transactionService, times(1)).updateStatus(any(Transaction.class));
     }
 
     @Test
-    void exchangeApi_io_problem() throws IOException {
-        given(exchangeApi.convert(any(String.class), any(String.class), any(BigDecimal.class))).willThrow(new IOException());
+    void exchangeApi_io_problem() throws Exception {
+        given(exchangeApi.convert(any(Currency.class), any(Currency.class), any(BigDecimal.class))).willThrow(new IOException());
 
         assertThrows(
                 Exception.class,

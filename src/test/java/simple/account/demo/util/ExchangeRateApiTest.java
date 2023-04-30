@@ -1,8 +1,7 @@
-package simple.account.demo.common;
+package simple.account.demo.util;
 
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -13,17 +12,14 @@ import org.mockito.Mock;
 import org.mockito.MockedStatic;
 import org.mockito.junit.jupiter.MockitoExtension;
 
-import java.io.ByteArrayInputStream;
-import java.io.IOException;
-import java.io.InputStream;
 import java.math.BigDecimal;
 import java.net.HttpURLConnection;
+import java.util.Currency;
 import java.util.stream.Stream;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.params.provider.Arguments.arguments;
-import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
@@ -33,12 +29,11 @@ public class ExchangeRateApiTest {
     @InjectMocks
     ExchangeRateApi exchangeRateApi = new ExchangeRateApi("https://www.dummy.com/");
 
-    static final String THB = "THB";
-    static final String USD = "USD";
+    static final Currency THB = Currency.getInstance("THB");
+    static final Currency USD = Currency.getInstance("USD");
 
-    @ParameterizedTest
-    @MethodSource("validCurrencies")
-    void convert(String base, String target) throws IOException {
+    @Test
+    void convert() throws Exception {
         BigDecimal expected = BigDecimal.TEN;
         JsonObject jsonObj = mockJsonObj(expected);
 
@@ -49,13 +44,13 @@ public class ExchangeRateApiTest {
             mocked.when(() -> ConnectionUtil.getJsonObjFromUrl(any(String.class)))
                     .thenReturn(jsonObj);
 
-            BigDecimal actual = exchangeRateApi.convert(base, target, expected);
+            BigDecimal actual = exchangeRateApi.convert(THB, USD, expected);
 
             assertEquals(0, expected.compareTo(actual));
         }
     }
     @Test
-    void convert_sameCurrencies() throws IOException {
+    void convert_sameCurrencies() throws Exception {
         BigDecimal expectedAmount = BigDecimal.TEN;
 
         BigDecimal actualAmount = exchangeRateApi.convert(THB, THB, expectedAmount);
@@ -63,37 +58,17 @@ public class ExchangeRateApiTest {
         assertEquals(0, expectedAmount.compareTo(actualAmount));
         verify(request, never()).getInputStream();
     }
-    @Disabled("use test method: [ExchangeRateApiTest.test_convert_mock_static()] instead")
-    @Test
-    void test_convert_mock_http() throws IOException {
-        BigDecimal expected = BigDecimal.TEN;
-        InputStream jsonIs = mockJsonInputStream(expected);
-        given(request.getInputStream()).willReturn(jsonIs);
 
-        BigDecimal actual = exchangeRateApi.convert(THB, USD, expected);
-
-        assertEquals(0, expected.compareTo(actual));
-    }
 
     @ParameterizedTest
-    @MethodSource("invalidCurrencies")
-    void test_convert_invalidBaseCurrency(String invalidCurrency) throws IOException {
+    @MethodSource("invalidCurrenciesSet")
+    void test_convert_invalidCurrencyParameter(Currency invalidCurrencyBase, Currency invalidCurrencyTarget) throws Exception {
         assertThrows(
             IllegalArgumentException.class,
-            () -> exchangeRateApi.convert(invalidCurrency, USD, BigDecimal.TEN)
+            () -> exchangeRateApi.convert(invalidCurrencyBase, invalidCurrencyTarget, BigDecimal.TEN)
         );
         verify(request, never()).getInputStream();
     }
-    @ParameterizedTest
-    @MethodSource("invalidCurrencies")
-    void test_convert_invalidTargetCurrency(String invalidCurrency) throws IOException {
-        assertThrows(
-            IllegalArgumentException.class,
-            () -> exchangeRateApi.convert(USD, invalidCurrency, BigDecimal.TEN)
-        );
-        verify(request, never()).getInputStream();
-    }
-
     @ParameterizedTest
     @MethodSource("invalidAmounts")
     void test_convert_invalidAmount(BigDecimal amount) throws Exception {
@@ -112,23 +87,12 @@ public class ExchangeRateApiTest {
         String json = "{\"conversion_result\" : " + obj + "}";
         return JsonParser.parseString(json).getAsJsonObject();
     }
-    private InputStream mockJsonInputStream(Object obj){
-        String json = "{\"conversion_result\" : " + obj + "}";
-        return new ByteArrayInputStream(json.getBytes());
-    }
-    static Stream<Arguments> validCurrencies(){
+    static Stream<Arguments> invalidCurrenciesSet() {
         return Stream.of(
-                arguments(THB, USD),
-                arguments("    THB    ", USD),
-                arguments(THB, "      CHF"),
-                arguments("thb", USD),
-                arguments(THB, "usd"),
-                arguments("    thb   ", USD),
-                arguments(THB, "    usd   ")
+                arguments(THB,null),
+                arguments(null,USD),
+                arguments(null,null)
         );
-    }
-    static Stream<String> invalidCurrencies() {
-        return Stream.of("TH B", "555555+", "", " ", null);
     }
     static Stream<BigDecimal> invalidAmounts() {
         return Stream.of(BigDecimal.ZERO, BigDecimal.TEN.negate(), null);
