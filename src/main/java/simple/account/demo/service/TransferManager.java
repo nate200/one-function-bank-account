@@ -69,7 +69,7 @@ public class TransferManager {
     }
 
     private Currency getAccountCurrency(long accId){
-        String currency = accountService.getAccountCurrency(accId);
+        String currency = accountService.getAccountRawCurrency(accId);
         return CurrencyUtil.getCurrencyFromString(currency);
     }
 }

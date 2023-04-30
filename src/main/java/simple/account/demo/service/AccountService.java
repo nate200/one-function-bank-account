@@ -28,7 +28,7 @@ public class AccountService {
             .orElseThrow(() -> throwAccountNotFound(accId));
     }
 
-    public String getAccountCurrency(long accId) {
+    public String getAccountRawCurrency(long accId) {
         return getAccountById(accId).getCurrency();
     }
 

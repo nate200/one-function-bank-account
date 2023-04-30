@@ -34,7 +34,7 @@ class TransferManagerTest {
 
     @Test
     void transferToWithInApp_success() throws Exception {
-        given(accountService.getAccountCurrency(anyLong())).willReturn("CHF");
+        given(accountService.getAccountRawCurrency(anyLong())).willReturn("CHF");
         given(exchangeApi.convert(any(Currency.class), any(Currency.class), any(BigDecimal.class))).willReturn(TEN);
         doNothing().when(accountService).changeTotal(any(BigDecimal.class), anyLong());
 
@@ -70,7 +70,7 @@ class TransferManagerTest {
 
     @Test
     void account_with_invalid_currency() throws Exception {
-        given(accountService.getAccountCurrency(anyLong())).willReturn("LOLOLOLOLOL");
+        given(accountService.getAccountRawCurrency(anyLong())).willReturn("LOLOLOLOLOL");
 
         assertThrows(
                 Exception.class,
@@ -97,7 +97,7 @@ class TransferManagerTest {
 
     @Test
     void non_exist_account() {
-        given(accountService.getAccountCurrency(anyLong())).willThrow(new EntityNotFoundException());
+        given(accountService.getAccountRawCurrency(anyLong())).willThrow(new EntityNotFoundException());
 
         assertThrows(
                 Exception.class,

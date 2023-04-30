@@ -7,15 +7,12 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import simple.account.demo.model.Account;
-import simple.account.demo.model.Transaction;
 import simple.account.demo.repository.AccountRepository;
 
 import java.math.BigDecimal;
 import java.util.Optional;
 
 import static java.math.BigDecimal.*;
-
-import static org.assertj.core.api.Assertions.*;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
@@ -104,7 +101,7 @@ class AccountServiceTest {
         Account expectedAcc = new Account(DEFAULT_ID, ZERO, "THB");
         given(repo.findById(DEFAULT_ID)).willReturn(Optional.of(expectedAcc));
 
-        String actualCurr = service.getAccountCurrency(DEFAULT_ID);
+        String actualCurr = service.getAccountRawCurrency(DEFAULT_ID);
         assertEquals(expectedAcc.getCurrency(), actualCurr);
     }
     @Test
@@ -113,7 +110,7 @@ class AccountServiceTest {
 
         EntityNotFoundException error = assertThrows(
                 EntityNotFoundException.class,
-                () -> service.getAccountCurrency(DEFAULT_ID)
+                () -> service.getAccountRawCurrency(DEFAULT_ID)
         );
         assertEquals("no account id:" + DEFAULT_ID, error.getMessage());
     }
