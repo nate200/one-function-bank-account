@@ -1,5 +1,6 @@
 package simple.account.demo.service;
 
+import jakarta.persistence.EntityNotFoundException;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -9,8 +10,9 @@ import simple.account.demo.model.Transaction;
 import simple.account.demo.model.TransactionStatus;
 import simple.account.demo.repository.TransactionRepository;
 
-import static java.math.BigDecimal.ZERO;
-import static org.assertj.core.api.Assertions.assertThat;
+import java.util.Optional;
+
+import static java.math.BigDecimal.TEN;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
@@ -23,28 +25,48 @@ class TransactionServiceTest {
     @InjectMocks
     TransactionService service;
 
+    final Transaction DEFAULT_TRANSACTION = new Transaction(null, "THB", 1L, 2L, TEN, null,null);
+
+    @Test
+    void saveTransaction(){
+        given(repo.save(any(Transaction.class))).willReturn(DEFAULT_TRANSACTION);
+
+        service.saveTransaction(DEFAULT_TRANSACTION);
+
+        verify(repo, times(1)).save(any(Transaction.class));
+    }
     @Test
     void saveTransaction_null(){
         assertThrows(
-            NullPointerException.class,
-            () -> service.saveTransaction(null)
+                NullPointerException.class,
+                () -> service.saveTransaction(null)
         );
         verify(repo, never()).save(any(Transaction.class));
     }
     @Test
-    void saveTransaction(){
-        Transaction expected = new Transaction(null, "THB", 1L, 2L, ZERO, TransactionStatus.DONE, "OKIE DOKIE");
-        given(repo.save(any(Transaction.class))).willReturn(expected);
+    void saveTransaction_already_exist(){
+        Transaction existingTran = DEFAULT_TRANSACTION.toBuilder().transactionId(1L).build();
+        given(repo.findById(anyLong())).willReturn(Optional.of(existingTran));
 
-        var actual = service.saveTransaction(expected.toBuilder().transactionId(1L).build());
+        assertThrows(
+                IllegalArgumentException.class,
+                () -> service.saveTransaction(existingTran)
+        );
 
-        assertThat(actual).isNotNull();
-        assertThat(actual).usingRecursiveComparison().isEqualTo(expected);
-        verify(repo, times(1)).save(any(Transaction.class));
+        verify(repo, never()).save(any(Transaction.class));
     }
 
+
     @Test
-    void call_updateStatus_null_parameter(){
+    void updateStatus(){
+        given(repo.updateStatus(any(TransactionStatus.class),any(String.class),anyLong())).willReturn(1);
+
+        service.updateStatus(DEFAULT_TRANSACTION.toBuilder().transactionId(1L).build());
+
+        verify(repo, times(1)).updateStatus(any(TransactionStatus.class),any(String.class),anyLong());
+    }
+    @Test
+    void updateStatus_null(){
         assertThrows(
                 NullPointerException.class,
                 () -> service.updateStatus(null)
@@ -52,13 +74,21 @@ class TransactionServiceTest {
         verify(repo, never()).updateStatus(any(TransactionStatus.class),any(String.class),anyLong());
     }
     @Test
-    void updateStatus(){
-        Transaction expected = new Transaction(1L, "THB", 1L, 2L, ZERO, TransactionStatus.DONE, "done and done");
-        given(repo.updateStatus(any(TransactionStatus.class),any(String.class),anyLong())).willReturn(1);
-
-        service.updateStatus(expected);
-
-        verify(repo, times(1)).updateStatus(any(TransactionStatus.class),any(String.class),anyLong());
+    void updateStatus_id_null(){
+        assertThrows(
+                NullPointerException.class,
+                () -> service.updateStatus(DEFAULT_TRANSACTION)
+        );
+        verify(repo, never()).updateStatus(any(TransactionStatus.class),any(String.class),anyLong());
     }
+    @Test
+    void updateStatus_non_exist_transaction(){
+        Transaction badTransaction = DEFAULT_TRANSACTION.toBuilder().transactionId(Long.MAX_VALUE).build();
+        given(repo.updateStatus(any(TransactionStatus.class),any(String.class),anyLong())).willReturn(0);
 
+        assertThrows(
+                EntityNotFoundException.class,
+                () -> service.updateStatus(badTransaction)
+        );
+    }
 }
