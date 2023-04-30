@@ -6,6 +6,7 @@ import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
@@ -21,6 +22,7 @@ import java.util.stream.Stream;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.params.provider.Arguments.arguments;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.*;
 
@@ -31,21 +33,12 @@ public class ExchangeRateApiTest {
     @InjectMocks
     ExchangeRateApi exchangeRateApi = new ExchangeRateApi("https://www.dummy.com/");
 
-    final String THB = "THB";
-    final String USD = "USD";
+    static final String THB = "THB";
+    static final String USD = "USD";
 
-    @Test
-    void test_sameCurrencies() throws IOException {
-        BigDecimal expectedAmount = BigDecimal.TEN;
-
-        BigDecimal actualAmount = exchangeRateApi.convert(THB, THB, expectedAmount);
-
-        assertEquals(0, expectedAmount.compareTo(actualAmount));
-        verify(request, never()).getInputStream();
-    }
-
-    @Test
-    void test_convert_mock_static() throws IOException {
+    @ParameterizedTest
+    @MethodSource("validCurrencies")
+    void convert(String base, String target) throws IOException {
         BigDecimal expected = BigDecimal.TEN;
         JsonObject jsonObj = mockJsonObj(expected);
 
@@ -54,12 +47,21 @@ public class ExchangeRateApiTest {
         try (MockedStatic<ConnectionUtil> mocked = mockStatic(ConnectionUtil.class))
         {
             mocked.when(() -> ConnectionUtil.getJsonObjFromUrl(any(String.class)))
-                .thenReturn(jsonObj);
+                    .thenReturn(jsonObj);
 
-            BigDecimal actual = exchangeRateApi.convert(THB, USD, expected);
+            BigDecimal actual = exchangeRateApi.convert(base, target, expected);
 
             assertEquals(0, expected.compareTo(actual));
         }
+    }
+    @Test
+    void convert_sameCurrencies() throws IOException {
+        BigDecimal expectedAmount = BigDecimal.TEN;
+
+        BigDecimal actualAmount = exchangeRateApi.convert(THB, THB, expectedAmount);
+
+        assertEquals(0, expectedAmount.compareTo(actualAmount));
+        verify(request, never()).getInputStream();
     }
     @Disabled("use test method: [ExchangeRateApiTest.test_convert_mock_static()] instead")
     @Test
@@ -76,11 +78,10 @@ public class ExchangeRateApiTest {
     @ParameterizedTest
     @MethodSource("invalidCurrencies")
     void test_convert_invalidBaseCurrency(String invalidCurrency) throws IOException {
-        IllegalArgumentException error = assertThrows(
+        assertThrows(
             IllegalArgumentException.class,
             () -> exchangeRateApi.convert(invalidCurrency, USD, BigDecimal.TEN)
         );
-        //assertThat(error.getMessage(), containsString(invalidCurrency));//can't containsString(null)
         verify(request, never()).getInputStream();
     }
     @ParameterizedTest
@@ -115,8 +116,19 @@ public class ExchangeRateApiTest {
         String json = "{\"conversion_result\" : " + obj + "}";
         return new ByteArrayInputStream(json.getBytes());
     }
+    static Stream<Arguments> validCurrencies(){
+        return Stream.of(
+                arguments(THB, USD),
+                arguments("    THB    ", USD),
+                arguments(THB, "      CHF"),
+                arguments("thb", USD),
+                arguments(THB, "usd"),
+                arguments("    thb   ", USD),
+                arguments(THB, "    usd   ")
+        );
+    }
     static Stream<String> invalidCurrencies() {
-        return Stream.of("TH B", "555555", "", " ", null);
+        return Stream.of("TH B", "555555+", "", " ", null);
     }
     static Stream<BigDecimal> invalidAmounts() {
         return Stream.of(BigDecimal.ZERO, BigDecimal.TEN.negate(), null);

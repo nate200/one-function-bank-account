@@ -8,6 +8,8 @@ import java.io.IOException;
 import java.math.BigDecimal;
 import java.util.Currency;
 
+import static java.math.BigDecimal.ZERO;
+
 @Getter
 @AllArgsConstructor
 public class ExchangeRateApi {
@@ -29,13 +31,13 @@ public class ExchangeRateApi {
         return jsonObject.get("conversion_result").getAsBigDecimal();
     }
     private void checkIfCurrencyValid(String currency){
-        try{ Currency.getInstance(currency); }
+        try{ Currency.getInstance(currency.trim().toUpperCase()); }
         catch (NullPointerException | IllegalArgumentException e){
-            throw new IllegalArgumentException("Currency:["+currency+"] is invalid");
+            throw new IllegalArgumentException("Currency ["+currency+"] is invalid");
         }
     }
     private void checkIfAmountValid(BigDecimal amount){
-        if(amount == null || BigDecimal.ZERO.compareTo(amount) >= 0)
+        if(amount == null || 0 <= ZERO.compareTo(amount))
             throw new IllegalArgumentException("The exchange amount must be decimal and greater than 0");
     }
 
