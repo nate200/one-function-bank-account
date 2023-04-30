@@ -24,15 +24,21 @@ public class AccountService {
 
     public Account getAccountById(long accId) {
         return accountRepo.findById(accId)
-            .orElseThrow(() -> new EntityNotFoundException("no account id:" + accId));
+            .orElseThrow(() -> throwAccountNotFound(accId));
     }
 
     public String getAccountCurrency(long accId) {
         return getAccountById(accId).getCurrency();
     }
 
-    public void changeTotal(BigDecimal amount, long id){
-        accountRepo.changeTotal(amount, id);
+    public void changeTotal(BigDecimal amount, long accId){
+        int rowAffected = accountRepo.changeTotal(amount, accId);
+        if(rowAffected == 0)
+            throw throwAccountNotFound(accId);
+    }
+
+    private static EntityNotFoundException throwAccountNotFound(long accId){
+        return new EntityNotFoundException("no account id:" + accId);
     }
 
 
