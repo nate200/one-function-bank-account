@@ -24,10 +24,7 @@ public class TransactionService {
     }
 
     public void updateStatus(@NonNull Transaction transaction){
-        Objects.requireNonNull(
-                transaction.getTransactionId(),
-                "can't update transaction status with id: null"
-        );
+        checkTransactionBeforeUpdatingStatus(transaction);
 
         int rowAffected = transactionRepo.updateStatus(
             transaction.getTransaction_status(),
@@ -37,5 +34,19 @@ public class TransactionService {
 
         if(rowAffected == 0)
             throw new EntityNotFoundException("can't update non existing transaction with id: " + transaction.getTransactionId());
+    }
+    private void checkTransactionBeforeUpdatingStatus(Transaction transaction) {
+        Objects.requireNonNull(
+                transaction.getTransactionId(),
+                "id must not be null when updating transaction status"
+        );
+        Objects.requireNonNull(
+                transaction.getTransaction_status(),
+                "Transaction_status must not be null when updating transaction status"
+        );
+        Objects.requireNonNull(
+                transaction.getTransaction_result(),
+                "Transaction_result must not be null when updating transaction status"
+        );
     }
 }
