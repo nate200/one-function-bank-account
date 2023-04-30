@@ -4,6 +4,7 @@ import lombok.AllArgsConstructor;
 import lombok.NonNull;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import simple.account.demo.exception.BadRequestParameterException;
 import simple.account.demo.util.CurrencyUtil;
 import simple.account.demo.util.ExchangeRateApi;
 import simple.account.demo.model.Transaction;
@@ -22,9 +23,10 @@ public class TransferManager {
 
     public void transferWithInApp(@NonNull Transaction transaction) throws Exception {
         try{
+            transaction.setTransactionId(null);
             transaction.setTransaction_status(TransactionStatus.PROCESSING);
             transaction.setTransaction_result("plz wait");
-            transactionService.saveTransaction(transaction);
+            transactionService.saveTransactionRequest(transaction);
 
             validateTransaction(transaction);
             transferBetweenAccounts(transaction);
@@ -58,13 +60,14 @@ public class TransferManager {
         accountService.changeTotal(convertedTransfer, transaction.getToAcc());
     }
     private void validateTransaction(Transaction transaction){
-        Objects.requireNonNull(transaction.getCurrency(), "The currency of the transaction must not be null");
-
+        String errorMsg = null;
         if(transaction.getToAcc() == transaction.getFromAcc())
-            throw new IllegalArgumentException("Can't do a transaction on the same account");
+            errorMsg = "Can't do a transaction on the same account";
+        else if(transaction.getAmount() == null || transaction.getAmount().compareTo(BigDecimal.ZERO) <= 0)
+            errorMsg = "The exchange amount must be decimal and greater than 0";
 
-        if(transaction.getAmount() == null || transaction.getAmount().compareTo(BigDecimal.ZERO) <= 0)
-            throw new IllegalArgumentException("The exchange amount must be decimal and greater than 0");
+        if(errorMsg != null)
+            throw new BadRequestParameterException(errorMsg);
     }
 
     private Currency getAccountCurrency(long accId){

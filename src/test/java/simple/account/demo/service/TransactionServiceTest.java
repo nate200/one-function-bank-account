@@ -8,6 +8,7 @@ import org.junit.jupiter.params.provider.MethodSource;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import simple.account.demo.exception.BadRequestParameterException;
 import simple.account.demo.model.Transaction;
 import simple.account.demo.model.TransactionStatus;
 import simple.account.demo.repository.TransactionRepository;
@@ -35,7 +36,7 @@ class TransactionServiceTest {
     void saveTransaction(){
         given(repo.save(any(Transaction.class))).willReturn(DEFAULT_TRANSACTION);
 
-        service.saveTransaction(DEFAULT_TRANSACTION);
+        service.saveTransactionRequest(DEFAULT_TRANSACTION);
 
         verify(repo, times(1)).save(any(Transaction.class));
     }
@@ -43,20 +44,8 @@ class TransactionServiceTest {
     void saveTransaction_null(){
         assertThrows(
                 NullPointerException.class,
-                () -> service.saveTransaction(null)
+                () -> service.saveTransactionRequest(null)
         );
-        verify(repo, never()).save(any(Transaction.class));
-    }
-    @Test
-    void saveTransaction_already_exist(){
-        Transaction existingTran = DEFAULT_TRANSACTION.toBuilder().transactionId(1L).build();
-        given(repo.findById(anyLong())).willReturn(Optional.of(existingTran));
-
-        assertThrows(
-                IllegalArgumentException.class,
-                () -> service.saveTransaction(existingTran)
-        );
-
         verify(repo, never()).save(any(Transaction.class));
     }
 

@@ -40,7 +40,7 @@ class TransferManagerTest {
 
         transferManager.transferWithInApp(DEFAULT_TRANSACTION);
 
-        verify(transactionService, times(1)).saveTransaction(any(Transaction.class));
+        verify(transactionService, times(1)).saveTransactionRequest(any(Transaction.class));
         verify(accountService, times(2)).changeTotal(any(BigDecimal.class), anyLong());
         verify(transactionService, times(1)).updateStatus(any(Transaction.class));
     }
