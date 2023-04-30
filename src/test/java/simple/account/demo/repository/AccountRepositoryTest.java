@@ -30,6 +30,7 @@ class AccountRepositoryTest {
     @PersistenceContext
     EntityManager em;//https://stackoverflow.com/questions/52857963/how-to-test-method-from-repository-which-marked-as-modifying
 
+
     @Test
     void insert() {
         BigDecimal expectedTotal = ZERO;
@@ -53,6 +54,7 @@ class AccountRepositoryTest {
         assertThat(error.getMessage()).contains("must not be null");
     }
 
+
     @Test
     void findCurrencyById() {
         String expectedCurrency = "CHF";
@@ -67,6 +69,7 @@ class AccountRepositoryTest {
         String currency = accountRepo.findCurrencyById(Long.MAX_VALUE);
         assertNull(currency);
     }
+
 
     @ParameterizedTest
     @MethodSource("validTransaction")
@@ -101,6 +104,7 @@ class AccountRepositoryTest {
             () -> accountRepo.changeTotal(invalidAmount, acc.getId())
         );
     }
+
 
     private BigDecimal getTotalById(long accId){
         Account account = accountRepo.findById(accId).orElseThrow();
