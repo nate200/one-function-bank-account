@@ -21,9 +21,9 @@ public class Transaction {
 
     @NotNull String currency;
     @Column(name = "from_acc")
-    @NotNull Long fromAcc;
+    @NotNull long fromAcc;
     @Column(name = "to_acc")
-    @NotNull Long toAcc;
+    @NotNull long toAcc;
     @NotNull BigDecimal amount;
     @NotNull @Enumerated(EnumType.STRING)
     @NotNull TransactionStatus transaction_status;

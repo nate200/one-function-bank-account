@@ -102,8 +102,6 @@ class TransactionRepositoryTest {
     static Stream<Transaction> invalidTransactionData() {
         return Stream.of(
             new Transaction(null,null, 1L, 2L, ZERO, DONE, "OKIE DOKIE"),
-            new Transaction(null,THB, null, 2L, ZERO, DONE, "OKIE DOKIE"),
-            new Transaction(null,THB, 1L, null, ZERO, DONE, "OKIE DOKIE"),
             new Transaction(null,THB, 1L, 2L, null, DONE, "OKIE DOKIE"),
             new Transaction(null,THB, 1L, 2L, ZERO, null, "OKIE DOKIE"),
             new Transaction(null,THB, 1L, 2L, ZERO, DONE, null)
