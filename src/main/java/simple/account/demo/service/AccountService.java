@@ -15,8 +15,8 @@ import java.util.Optional;
 public class AccountService {
     AccountRepository accountRepo;
 
-    public Account saveAccount(@NonNull Account account) {
-        Optional<Account> savedAcc = accountRepo.findById(account.getId());
+    public Account createAccount(@NonNull Account account) {
+        Optional<Account> savedAcc = accountRepo.findByEmail(account.getEmail());
         if(savedAcc.isPresent())
             throw new IllegalArgumentException("Account already exist with given Id:" + account.getId());
 

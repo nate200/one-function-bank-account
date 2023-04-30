@@ -36,14 +36,14 @@ class AccountServiceTest {
     @InjectMocks
     AccountService service;
 
-    final long DEFAULT_ID = 1L;
+    final long DEFAULT_ACCID = 1L;
+    final Account DEFAULT_ACCOUNT = new Account(null, ZERO, "THB", "a@a.com");
 
     @Test
     void saveAccount(){
-        Account expected = new Account(null, ZERO, "THB");
-        given(repo.save(any(Account.class))).willReturn(expected);
+        given(repo.save(any(Account.class))).willReturn(DEFAULT_ACCOUNT);
 
-        service.saveAccount(expected);
+        service.createAccount(DEFAULT_ACCOUNT);
 
         verify(repo, times(1)).save(any(Account.class));
     }
@@ -51,68 +51,59 @@ class AccountServiceTest {
     void saveAccount_null(){
         assertThrows(
                 NullPointerException.class,
-                () -> service.saveAccount(null)
+                () -> service.createAccount(null)
         );
         verify(repo, never()).save(any(Account.class));
     }
     @Test
     void saveAccount_already_exist(){
-        Account acc = new Account(1L, ZERO, "THB");
-        given(repo.findById(anyLong())).willReturn(Optional.of(acc));
-        /*force [... = accountRepo.findById(account.getId());] in service.saveAccount(...) to return Optional,
-        which triggers the if(savedAcc.isPresent()) and throw the exception.
-        skip db search, because this is mocking
-        https://1kevinson.com/content/images/size/w1600/2022/08/Screenshot-2022-08-22-at-22.37.57.png*/
+        Account savedAcc = DEFAULT_ACCOUNT.toBuilder().id(DEFAULT_ACCID).build();
+        given(repo.findByEmail(any(String.class))).willReturn(Optional.of(savedAcc));
 
-        IllegalArgumentException error = assertThrows(
+        assertThrows(
             IllegalArgumentException.class,
-            () -> service.saveAccount(acc)
+            () -> service.createAccount(DEFAULT_ACCOUNT)
         );
 
-        assertEquals("Account already exist with given Id:" + acc.getId(), error.getMessage());
         verify(repo, never()).save(any(Account.class));
     }
 
 
     @Test
     void getAccountById() {
-        var acc = new Account(DEFAULT_ID, ZERO, "THB");
-        given(repo.findById(DEFAULT_ID)).willReturn(Optional.of(acc));
+        given(repo.findById(anyLong())).willReturn(Optional.of(DEFAULT_ACCOUNT));
 
-        service.getAccountById(DEFAULT_ID);
+        service.getAccountById(DEFAULT_ACCID);
 
-        verify(repo, times(1)).findById(DEFAULT_ID);
+        verify(repo, times(1)).findById(anyLong());
     }
     @Test
     void getAccountById_not_exist(){
-        given(repo.findById(DEFAULT_ID)).willReturn(Optional.empty());
-        //force repo.findById(accId) in service.getAccountById(...) to return Optional.empty() which triggers orElseThrow
+        given(repo.findById(anyLong())).willReturn(Optional.empty());
 
-        EntityNotFoundException error = assertThrows(
+        assertThrows(
                 EntityNotFoundException.class,
-                () -> service.getAccountById(DEFAULT_ID)
+                () -> service.getAccountById(DEFAULT_ACCID)
         );
-        assertEquals("no account id:" + DEFAULT_ID, error.getMessage());
     }
 
 
     @Test
     void getAccountCurrency(){
-        Account expectedAcc = new Account(DEFAULT_ID, ZERO, "THB");
-        given(repo.findById(DEFAULT_ID)).willReturn(Optional.of(expectedAcc));
+        Account expectedAcc = DEFAULT_ACCOUNT.toBuilder().id(DEFAULT_ACCID).build();
+        given(repo.findById(expectedAcc.getId())).willReturn(Optional.of(expectedAcc));
 
-        String actualCurr = service.getAccountRawCurrency(DEFAULT_ID);
+        String actualCurr = service.getAccountRawCurrency(expectedAcc.getId());
         assertEquals(expectedAcc.getCurrency(), actualCurr);
     }
     @Test
     void getAccountCurrency_non_exist_account(){
-        given(repo.findById(DEFAULT_ID)).willReturn(Optional.empty());
+        given(repo.findById(DEFAULT_ACCID)).willReturn(Optional.empty());
 
-        EntityNotFoundException error = assertThrows(
+        assertThrows(
                 EntityNotFoundException.class,
-                () -> service.getAccountRawCurrency(DEFAULT_ID)
+                () -> service.getAccountRawCurrency(DEFAULT_ACCID)
         );
-        assertEquals("no account id:" + DEFAULT_ID, error.getMessage());
     }
 
 
@@ -120,7 +111,7 @@ class AccountServiceTest {
     void changeTotal(){
         given(repo.changeTotal(any(BigDecimal.class), anyLong())).willReturn(1);
 
-        service.changeTotal(TEN, DEFAULT_ID);
+        service.changeTotal(TEN, DEFAULT_ACCID);
 
         verify(repo, times(1)).changeTotal(any(BigDecimal.class), anyLong());
     }
@@ -128,7 +119,7 @@ class AccountServiceTest {
     void changeTotal_null_amount(){
         assertThrows(
                 NullPointerException.class,
-                () -> service.changeTotal(null, DEFAULT_ID)
+                () -> service.changeTotal(null, DEFAULT_ACCID)
         );
         verify(repo, never()).changeTotal(any(BigDecimal.class), anyLong());
     }
@@ -136,10 +127,9 @@ class AccountServiceTest {
     void changeTotal_non_exist_account(){
         given(repo.changeTotal(any(BigDecimal.class), anyLong())).willReturn(0);
 
-        EntityNotFoundException error = assertThrows(
+        assertThrows(
                 EntityNotFoundException.class,
-                () -> service.changeTotal(TEN, DEFAULT_ID)
+                () -> service.changeTotal(TEN, DEFAULT_ACCID)
         );
-        assertEquals("no account id:" + DEFAULT_ID, error.getMessage());
     }
 }

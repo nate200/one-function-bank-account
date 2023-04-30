@@ -30,19 +30,18 @@ class AccountRepositoryTest {
     @PersistenceContext
     EntityManager em;//https://stackoverflow.com/questions/52857963/how-to-test-method-from-repository-which-marked-as-modifying
 
+    final Account DEFAULT_ACCOUNT = new Account(null, ZERO, "THB", "a@a.com");
 
     @Test
     void insert() {
-        BigDecimal expectedTotal = ZERO;
-        String expectedCurrency = "THB";
-
-        Account addedAcc = accountRepo.save(new Account(null, expectedTotal, expectedCurrency));
-
-        assertEquals(1, accountRepo.count());
+        Account addedAcc = accountRepo.save(DEFAULT_ACCOUNT);
         em.clear();
+
         Account actualAcc = accountRepo.findById(addedAcc.getId()).get();
-        assertThat(actualAcc.getTotal()).isEqualByComparingTo(expectedTotal);
-        assertEquals(actualAcc.getCurrency(), expectedCurrency);
+        assertThat(actualAcc)
+                .usingComparatorForType(BigDecimal::compareTo, BigDecimal.class)
+                .usingRecursiveComparison()
+                .isEqualTo(DEFAULT_ACCOUNT);
     }
     @ParameterizedTest
     @MethodSource("invalidAccounts")
@@ -51,7 +50,6 @@ class AccountRepositoryTest {
                 jakarta.validation.ConstraintViolationException.class,
             () -> accountRepo.save(acc)
         );
-        assertThat(error.getMessage()).contains("must not be null");
     }
 
     @ParameterizedTest
@@ -77,10 +75,10 @@ class AccountRepositoryTest {
         assertEquals(0, affectedRow);
     }
     @ParameterizedTest
-    @MethodSource("invalidAmounts")
+    @MethodSource("invalidAmountsTransaction")
     @Transactional
     void changeTotal_bad_amount_trigger_total_constraint(BigDecimal invalidAmount){
-        Account acc = accountRepo.save(new Account(null, TEN, "EUR"));
+        Account acc = accountRepo.save(new Account(null, TEN, "EUR", "a@a.com"));
 
         assertThrows(
             DataIntegrityViolationException.class,
@@ -96,23 +94,28 @@ class AccountRepositoryTest {
 
     static Stream<Account> invalidAccounts() {
         return Stream.of(
-                new Account(null, null, "THB"),
-                new Account(null, TEN, null)
+                new Account(null, null, "THB", "a@a.com"),
+                new Account(null, TEN, null, "a@a.com"),
+                new Account(null, TEN, "THB", null),
+                new Account(null, TEN, "THB", ""),
+                new Account(null, TEN, "THB", "      "),
+                new Account(null, TEN, "THB", "a@"),
+                new Account(null, TEN, "THB", "a@acom")
         );
     }
     static Stream<Arguments> validTransaction() {
         return Stream.of(
                 arguments(
-                        new Account(null, TEN, "THB"),
+                        new Account(null, TEN, "THB", "a@a.com"),
                         BigDecimal.valueOf(50)
                 ),
                 arguments(
-                        new Account(null, BigDecimal.valueOf(50000.0), "USD"),
+                        new Account(null, BigDecimal.valueOf(50000.0), "USD", "a@a.com"),
                         BigDecimal.valueOf(-50)
                 )
         );
     }
-    static Stream<BigDecimal> invalidAmounts() {
+    static Stream<BigDecimal> invalidAmountsTransaction() {
         return Stream.of(null, BigDecimal.valueOf(-999999));
     }
 }

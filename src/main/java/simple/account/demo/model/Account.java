@@ -2,6 +2,7 @@ package simple.account.demo.model;
 
 import jakarta.persistence.*;
 
+import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotNull;
 import lombok.*;
@@ -11,6 +12,7 @@ import java.math.BigDecimal;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
+@Builder(toBuilder = true)
 
 @Entity
 @Table(name = "account")
@@ -25,6 +27,10 @@ public class Account {
 
     @NotNull
     String currency;
+
+    @NotNull
+    @Email(regexp = ".+\\@.+\\..+")//simple, for now
+    String email;
 }
 
 /*CREATE TABLE ACCOUNT (

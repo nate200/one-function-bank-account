@@ -9,6 +9,7 @@ import org.springframework.stereotype.Repository;
 import simple.account.demo.model.Account;
 
 import java.math.BigDecimal;
+import java.util.Optional;
 
 @Repository
 public interface AccountRepository extends JpaRepository<Account, Long> {
@@ -22,4 +23,6 @@ public interface AccountRepository extends JpaRepository<Account, Long> {
         @Param("amount") BigDecimal amount,
         @Param("accId") long accId
     );
+
+    Optional<Account> findByEmail(String email);
 }
