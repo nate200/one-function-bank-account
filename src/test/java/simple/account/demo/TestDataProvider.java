@@ -5,8 +5,22 @@ import simple.account.demo.model.Account;
 import java.util.stream.Stream;
 
 import static java.math.BigDecimal.TEN;
+import static java.math.BigDecimal.ZERO;
 
 public class TestDataProvider {
+    static Stream<Account> validAccounts(){
+        return Stream.of(
+                Account.builder().total(ZERO).currency("THB").email("a@a.com").build(),
+                Account.builder().total(TEN.negate()).currency("THB").email("a@a.com").build(),
+                Account.builder().total(TEN).currency("THB").email("a@a.com").build(),
+                Account.builder().total(TEN).currency("     THB").email("a@a.com").build(),
+                Account.builder().total(TEN).currency("THB       ").email("a@a.com").build(),
+                Account.builder().total(TEN).currency("     THB     ").email("a@a.com").build(),
+                Account.builder().total(TEN).currency("THB").email("     a@a.com").build(),
+                Account.builder().total(TEN).currency("THB").email("a@a.com     ").build(),
+                Account.builder().total(TEN).currency("THB").email("      a@a.com     ").build()
+        );
+    }
     static Stream<Account> badNewAccountRequest(){
         String validCurrency = "THB";
         String validEmail = "a@a.com";
@@ -14,7 +28,7 @@ public class TestDataProvider {
                 Account.builder().total(null).currency(validCurrency).email(validEmail).build(),
                 Account.builder().total(TEN).currency(null).email(validEmail).build(),
                 Account.builder().total(TEN).currency(" TH B").email(validEmail).build(),
-                Account.builder().total(TEN).currency(" TH1C   ").email(validEmail).build(),
+                Account.builder().total(TEN).currency(" THICCCCCC ").email(validEmail).build(),
                 Account.builder().total(TEN).currency(validCurrency).email(null).build(),
                 Account.builder().total(TEN).currency(validCurrency).email("").build(),
                 Account.builder().total(TEN).currency(validCurrency).email("   ").build(),

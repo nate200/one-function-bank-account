@@ -34,7 +34,7 @@ class AccountServiceTest {
     final Account DEFAULT_ACCOUNT = new Account(null, ZERO, "THB", "a@a.com");
 
     @ParameterizedTest
-    @MethodSource("validAccounts")
+    @MethodSource("simple.account.demo.TestDataProvider#validAccounts")
     void saveAccount(Account acc){
         given(repo.save(any(Account.class))).willReturn(acc);
 
@@ -147,19 +147,7 @@ class AccountServiceTest {
         );
     }
 
-    static Stream<Account> validAccounts(){
-        return Stream.of(
-                Account.builder().total(ZERO).currency("THB").email("a@a.com").build(),
-                Account.builder().total(TEN.negate()).currency("THB").email("a@a.com").build(),
-                Account.builder().total(TEN).currency("THB").email("a@a.com").build(),
-                Account.builder().total(TEN).currency("     THB").email("a@a.com").build(),
-                Account.builder().total(TEN).currency("THB       ").email("a@a.com").build(),
-                Account.builder().total(TEN).currency("     THB     ").email("a@a.com").build(),
-                Account.builder().total(TEN).currency("THB").email("     a@a.com").build(),
-                Account.builder().total(TEN).currency("THB").email("a@a.com     ").build(),
-                Account.builder().total(TEN).currency("THB").email("      a@a.com     ").build()
-        );
-    }
+
 
     static Stream<Account> AccountsInvalidEmail(){
         return Stream.of(

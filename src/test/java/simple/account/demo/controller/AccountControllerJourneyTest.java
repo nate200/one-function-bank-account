@@ -1,23 +1,16 @@
 package simple.account.demo.controller;
 
-import io.restassured.RestAssured;
-import org.aspectj.lang.annotation.After;
-import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.web.server.LocalServerPort;
 import org.springframework.http.MediaType;
 import simple.account.demo.DbTestBase;
 import simple.account.demo.RecursiveCompareWithBigDecimal;
-import simple.account.demo.controller.ControllerExceptionHandler;
 import simple.account.demo.model.Account;
 import simple.account.demo.repository.AccountRepository;
-
-import java.util.stream.Stream;
 
 import static io.restassured.RestAssured.given;
 import static java.math.BigDecimal.TEN;
@@ -37,13 +30,14 @@ public class AccountControllerJourneyTest extends DbTestBase {
         accRepo.deleteAll();
     }
 
-    @Test
-    void createAccount(){
+    @ParameterizedTest
+    @MethodSource("simple.account.demo.TestDataProvider#validAccounts")
+    void createAccount(Account validAccount){
         assertEquals(0,accRepo.count());
 
         given()
             .contentType(MediaType.APPLICATION_JSON_VALUE)
-            .body(Account.builder().total(TEN).currency("THB").email("a@a.com").build())
+            .body(validAccount)
             .when().post("/create-account").then()
             .statusCode(SC_OK);
 
