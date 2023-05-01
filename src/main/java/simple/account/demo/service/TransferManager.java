@@ -5,14 +5,13 @@ import lombok.NonNull;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import simple.account.demo.exception.BadRequestParameterException;
-import simple.account.demo.util.CurrencyUtil;
-import simple.account.demo.util.ExchangeRateApi;
 import simple.account.demo.model.Transaction;
 import simple.account.demo.model.TransactionStatus;
+import simple.account.demo.util.CurrencyUtil;
+import simple.account.demo.util.ExchangeRateApi;
 
 import java.math.BigDecimal;
 import java.util.Currency;
-import java.util.Objects;
 
 @Service
 @AllArgsConstructor
@@ -22,11 +21,11 @@ public class TransferManager {
     TransactionService transactionService;
 
     public void transferWithInApp(@NonNull Transaction transaction) throws Exception {
-        try{
-            transaction.setTransaction_status(TransactionStatus.PROCESSING);
-            transaction.setTransaction_result("plz wait");
-            transactionService.saveTransactionRequest(transaction);
+        transaction.setTransaction_status(TransactionStatus.PROCESSING);
+        transaction.setTransaction_result("plz wait");
+        transactionService.saveTransactionRequest(transaction);
 
+        try{
             validateTransaction(transaction);
             transferBetweenAccounts(transaction);
 

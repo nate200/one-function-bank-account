@@ -2,9 +2,11 @@ package simple.account.demo.service;
 
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.validation.ConstraintViolationException;
+import lombok.AllArgsConstructor;
 import lombok.NonNull;
-import lombok.RequiredArgsConstructor;
+
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import simple.account.demo.exception.BadRequestParameterException;
 import simple.account.demo.model.Transaction;
 import simple.account.demo.repository.TransactionRepository;
@@ -12,7 +14,7 @@ import simple.account.demo.repository.TransactionRepository;
 import java.util.Objects;
 
 @Service
-@RequiredArgsConstructor
+@AllArgsConstructor
 public class TransactionService {
     TransactionRepository transactionRepo;
 
@@ -26,6 +28,7 @@ public class TransactionService {
         }
     }
 
+    @Transactional
     public void updateStatus(@NonNull Transaction transaction){
         checkTransactionBeforeUpdatingStatus(transaction);
 
