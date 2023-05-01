@@ -51,7 +51,7 @@ class AccountServiceTest {
         verify(repo, never()).save(any(Account.class));
     }
     @ParameterizedTest
-    @MethodSource("AccountsInvalidFieldExceptEmail")
+    @MethodSource("simple.account.demo.TestDataProvider#badNewAccountRequest")
     void saveAccount_bad_field_except_email(Account invalidAcc){
         assertThrows(
             BadRequestParameterException.class,
@@ -160,12 +160,7 @@ class AccountServiceTest {
                 Account.builder().total(TEN).currency("THB").email("      a@a.com     ").build()
         );
     }
-    static Stream<Account> AccountsInvalidFieldExceptEmail(){
-        return Stream.of(
-                Account.builder().total(null).currency("THB").email("a@a.com").build(),
-                Account.builder().total(TEN).currency(null).email("a@a.com").build()
-        );
-    }
+
     static Stream<Account> AccountsInvalidEmail(){
         return Stream.of(
                 Account.builder().total(TEN).currency("THB").email(null).build(),
