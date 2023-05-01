@@ -8,12 +8,11 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockHttpServletRequestBuilder;
-import simple.account.demo.exception.BadRequestParameterException;
+import simple.account.demo.exception.business.BadRequestParameterException;
 import simple.account.demo.model.Transaction;
 import simple.account.demo.service.TransferManager;
 
 import static java.math.BigDecimal.TEN;
-import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.doThrow;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
@@ -42,7 +41,7 @@ class TransactionControllerTest {
     }
     @Test
     void transferToWithInApp_400() throws Exception {
-        doThrow(BadRequestParameterException.class).when(transferManager).transferWithInApp(any(Transaction.class));
+        doThrow(new BadRequestParameterException("bruh")).when(transferManager).transferWithInApp(any(Transaction.class));
         this.mvc.perform(POST_TRANSFER_TO_WITH_IN_APP)
                 .andExpect(status().isBadRequest());
     }

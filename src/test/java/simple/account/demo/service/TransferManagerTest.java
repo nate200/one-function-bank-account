@@ -8,6 +8,7 @@ import org.junit.jupiter.params.provider.MethodSource;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import simple.account.demo.exception.business.BadRequestParameterException;
 import simple.account.demo.util.ExchangeRateApi;
 import simple.account.demo.model.Transaction;
 
@@ -60,7 +61,7 @@ class TransferManagerTest {
     @MethodSource("badTransactions")
     void validateTransaction(Transaction badTransaction) {
         assertThrows(
-                Exception.class,
+                BadRequestParameterException.class,
                 () -> transferManager.transferWithInApp(badTransaction)
         );
         verifyNoInteractions(accountService);

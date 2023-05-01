@@ -11,18 +11,15 @@ import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.test.web.servlet.request.MockHttpServletRequestBuilder;
-import simple.account.demo.exception.BadRequestParameterException;
+import simple.account.demo.exception.business.BadRequestParameterException;
 import simple.account.demo.model.Account;
-import simple.account.demo.model.Transaction;
 import simple.account.demo.service.AccountService;
-import simple.account.demo.service.TransferManager;
 
 import java.math.BigDecimal;
 
 import static java.math.BigDecimal.TEN;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.hamcrest.Matchers.containsString;
-import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.doThrow;
@@ -56,7 +53,7 @@ public class AccountControllerTest {
     }
     @Test
     void createAccount_400() throws Exception {
-        doThrow(BadRequestParameterException.class).when(accountService).createAccountRequest(DEFAULT_ACC);
+        doThrow(new BadRequestParameterException("bruh")).when(accountService).createAccountRequest(DEFAULT_ACC);
         this.mvc.perform(POST_CREATE_ACCOUNT)
                 .andExpect(status().isBadRequest());
     }

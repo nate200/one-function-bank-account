@@ -5,22 +5,27 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
-import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler;
-import simple.account.demo.exception.BadRequestParameterException;
-import simple.account.demo.exception.BusinessLogicException;
+import simple.account.demo.exception.ApiError;
+import simple.account.demo.exception.business.BusinessLogicException;
 
 @ControllerAdvice
 public class ControllerExceptionHandler extends ResponseEntityExceptionHandler {
+
     @ExceptionHandler(Exception.class)
-    public ResponseEntity<?> handleErrorBeforeSending(Exception ex) {
-        if(ex instanceof BadRequestParameterException)//Patterns in switch are not supported at language level '17'
-            return ResponseEntity.badRequest().body(ex.getMessage());
-        else
-            return ResponseEntity.internalServerError().body("oopsie");
+    public ResponseEntity<ApiError> handleError(Exception ex) {
+        System.out.println(ex.getMessage());
+        if(ex instanceof BusinessLogicException bex){
+            ApiError er = new ApiError(bex.getStatus(), bex.getMessage());
+            System.out.println(er);
+            return ResponseEntity.status(bex.getStatus()).body(er);
+        }
+        else {
+            ex.printStackTrace();
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(new ApiError(HttpStatus.INTERNAL_SERVER_ERROR, "my bad ;("));
+        }
     }
 
-    @ResponseStatus(HttpStatus.NOT_FOUND)
     @ExceptionHandler(EntityNotFoundException.class)
     public ResponseEntity<?> handleNotFound(Exception ex) {
         return ResponseEntity.status(404).body(ex.getMessage());

@@ -8,7 +8,7 @@ import org.junit.jupiter.params.provider.MethodSource;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import simple.account.demo.exception.BadRequestParameterException;
+import simple.account.demo.exception.business.BadRequestParameterException;
 import simple.account.demo.model.Account;
 import simple.account.demo.repository.AccountRepository;
 

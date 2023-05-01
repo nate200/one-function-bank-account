@@ -5,7 +5,7 @@ import lombok.AllArgsConstructor;
 import lombok.NonNull;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import simple.account.demo.exception.BadRequestParameterException;
+import simple.account.demo.exception.business.BadRequestParameterException;
 import simple.account.demo.model.Account;
 import simple.account.demo.repository.AccountRepository;
 import simple.account.demo.util.CurrencyUtil;
