@@ -1,8 +1,11 @@
 package simple.account.demo.service;
 
 import jakarta.persistence.EntityNotFoundException;
+import jakarta.validation.ConstraintViolationException;
+import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import simple.account.demo.exception.BadRequestParameterException;
 import simple.account.demo.model.Account;
 import simple.account.demo.repository.AccountRepository;
 
@@ -14,25 +17,32 @@ import java.util.Optional;
 public class AccountService {
     AccountRepository accountRepo;
 
-    public Account saveAccount(Account account) {
-        Optional<Account> savedAcc = accountRepo.findById(account.getId());
+    public void createAccountRequest(@NonNull Account account) {
+        Optional<Account> savedAcc = accountRepo.findByEmail(account.getEmail());
         if(savedAcc.isPresent())
-            throw new IllegalArgumentException("Account already exist with given Id:" + account.getId());
+            throw new BadRequestParameterException("Account with email[" + account.getEmail() + "] is already exist");
 
-        return accountRepo.save(account);
+        accountRepo.save(account);
+        System.out.println("yes");
     }
 
     public Account getAccountById(long accId) {
         return accountRepo.findById(accId)
-            .orElseThrow(() -> new EntityNotFoundException("no account id:" + accId));
+            .orElseThrow(() -> throwAccountNotFound(accId));
     }
 
-    public String getAccountCurrency(long accId) {
+    public String getAccountRawCurrency(long accId) {
         return getAccountById(accId).getCurrency();
     }
 
-    public void changeTotal(BigDecimal amount, long id){
-        accountRepo.changeTotal(amount, id);
+    public void changeTotal(@NonNull BigDecimal amount, long accId){
+        int rowAffected = accountRepo.changeTotal(amount, accId);
+        if(rowAffected == 0)
+            throw throwAccountNotFound(accId);
+    }
+
+    private static EntityNotFoundException throwAccountNotFound(long accId){
+        return new EntityNotFoundException("no account id:" + accId);
     }
 
 

@@ -3,15 +3,20 @@ package simple.account.demo.model;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
 import lombok.*;
+import org.springframework.data.annotation.CreatedDate;
+import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import java.math.BigDecimal;
+import java.util.Date;
 
 @Data
 @AllArgsConstructor
+@NoArgsConstructor
 @Builder(toBuilder=true)
 
 @Entity
 @Table(name = "TRANSACTION")
+@EntityListeners(AuditingEntityListener.class)
 public class Transaction {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -20,12 +25,18 @@ public class Transaction {
 
     @NotNull String currency;
     @Column(name = "from_acc")
-    @NotNull Long fromAcc;
+    @NotNull long fromAcc;
     @Column(name = "to_acc")
-    @NotNull Long toAcc;
+    @NotNull long toAcc;
     @NotNull BigDecimal amount;
+    @NotNull @Enumerated(EnumType.STRING)
+    @NotNull TransactionStatus transaction_status;
     @NotNull String transaction_result;
-    @NotNull String transaction_result_reason;
+
+    @CreatedDate
+    @Temporal(TemporalType.TIMESTAMP)
+    @Column(name = "create_time")
+    Date createTime;
 }
 /*
 CREATE TABLE TRANSACTION (
@@ -33,7 +44,9 @@ CREATE TABLE TRANSACTION (
     currency VARCHAR ( 10 ) NOT NULL,
     from_acc integer references ACCOUNT (id) NOT NULL,
     to_acc integer references ACCOUNT (id) NOT NULL,
-    amount DECIMAL NOT NULL
+    amount DECIMAL NOT NULL.
+    transaction_status VARCHAR ( 20 ) NOT NULL,
+    transaction_result VARCHAR ( 30 ) NOT NULL
 );
 
 CREATE TABLE TRANSACTION (
@@ -41,6 +54,12 @@ CREATE TABLE TRANSACTION (
     currency VARCHAR ( 10 ) NOT NULL,
     from_acc integer NOT NULL,
     to_acc integer NOT NULL,
-    amount DECIMAL NOT NULL
+    amount DECIMAL NOT NULL,
+    transaction_status VARCHAR ( 20 ) NOT NULL,
+    transaction_result VARCHAR ( 30 ) NOT NULL
 );
+insert into transaction (amount, currency, from_acc, to_acc, transaction_result, transaction_status) values (1, 'THB', 1, 2, 'PROCESSING', 'plz wait ;)');
+UPDATE Transaction
+    SET transaction_status = 'DONE' , transaction_result = 'done and done'
+    WHERE transaction_id = 1;
 */

@@ -3,7 +3,7 @@ package simple.account.demo.config;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import simple.account.demo.common.ExchangeRateApi;
+import simple.account.demo.util.ExchangeRateApi;
 
 @Configuration
 public class TransferResourceConfig {

@@ -2,11 +2,10 @@ package simple.account.demo.repository;
 
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
-import org.hibernate.exception.ConstraintViolationException;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
-import org.junit.jupiter.params.provider.CsvSource;
+import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.MethodSource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.dao.DataIntegrityViolationException;
@@ -14,14 +13,12 @@ import org.springframework.transaction.annotation.Transactional;
 import simple.account.demo.model.Account;
 
 import java.math.BigDecimal;
-import java.util.List;
+import java.util.stream.Stream;
 
 import static java.math.BigDecimal.*;
-import static org.hamcrest.CoreMatchers.containsString;
-import static org.hamcrest.CoreMatchers.instanceOf;
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.comparesEqualTo;
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.params.provider.Arguments.arguments;
 
 
 @DataJpaTest
@@ -31,116 +28,94 @@ class AccountRepositoryTest {
     @Autowired
     AccountRepository accountRepo;
     @PersistenceContext
-    EntityManager entityManager;//https://stackoverflow.com/questions/52857963/how-to-test-method-from-repository-which-marked-as-modifying
+    EntityManager em;//https://stackoverflow.com/questions/52857963/how-to-test-method-from-repository-which-marked-as-modifying
 
-    List<Account> ACCOUNTS;
-
-    @BeforeEach
-    void setupAccounts(){
-        ACCOUNTS = List.of(
-            new Account(null, TEN, "THB"),
-            new Account(null, BigDecimal.valueOf(50000.0), "USD")
-        );
-    }
+    final Account DEFAULT_ACCOUNT = new Account(null, ZERO, "THB", "a@a.com");
 
     @Test
-    void test_Autowired(){
-        assertNotNull(accountRepo);
-    }
+    void insert() {
+        Account addedAcc = accountRepo.save(DEFAULT_ACCOUNT);
+        em.clear();
 
-    @Test
-    void test_insert_null_to_NonNull(){
+        Account actualAcc = accountRepo.findById(addedAcc.getId()).get();
+        assertThat(actualAcc)
+                .usingComparatorForType(BigDecimal::compareTo, BigDecimal.class)
+                .usingRecursiveComparison()
+                .isEqualTo(DEFAULT_ACCOUNT);
+    }
+    @ParameterizedTest
+    @MethodSource("invalidAccounts")
+    void insert_invalid_account_then_throw(Account acc){
         jakarta.validation.ConstraintViolationException error = assertThrows(
                 jakarta.validation.ConstraintViolationException.class,
-            () -> accountRepo.save(new Account(null,TEN,null)),
-            "Expected ConstraintViolationException.class"
+            () -> accountRepo.save(acc)
         );
-
-        assertThat(error.getMessage(), containsString("must not be null"));
-    }
-
-    @Test
-    void test_insertSuccess(){
-        accountRepo.saveAll(ACCOUNTS);
-        assertTrue(ACCOUNTS.size() <= accountRepo.count());
-    }
-
-    @Test
-    void test_insert() {
-        Account acc = new Account(null, ZERO, "THB");
-        entityManager.persist(acc);
-
-        accountRepo.save(new Account(null, acc.getTotal(), acc.getCurrency()));
-        List<Account> accounts = accountRepo.findAll();
-
-        assertEquals(2,accounts.size());
-        Account account = accounts.get(0);
-        assertEquals(acc.getTotal(),account.getTotal());
-        assertEquals(acc.getCurrency(),account.getCurrency());
-    }
-
-    @Test
-    void test_findCurrencyById() {
-        Account acc = accountRepo.save(ACCOUNTS.get(0));
-
-        String currency = accountRepo.findCurrencyById(acc.getId());
-
-        assertEquals(acc.getCurrency(), currency);
-    }
-
-    @Test
-    @Transactional
-    void test_changeTotal_constraint(){
-        Account acc = accountRepo.save(ACCOUNTS.get(0));
-
-        DataIntegrityViolationException error = assertThrows(
-            DataIntegrityViolationException.class,
-            () -> accountRepo.changeTotal(new BigDecimal(-999999), acc.getId()),
-            "Expected DataIntegrityViolationException.class"
-        );
-
-        System.out.println(error.getClass().getName() + " " + error.getMessage() + " " + error.getLocalizedMessage());
-        assertThat(error.getCause(), instanceOf(ConstraintViolationException.class));
-        //ConstraintViolationException cause = (ConstraintViolationException)error.getCause();
-        //assertEquals("account_total_check", cause.getConstraintName()); //H2 not Postgres
     }
 
     @ParameterizedTest
-    @CsvSource({"0,50", "1,-50"})
+    @MethodSource("validTransaction")
     @Transactional
-    void test_changeTotal(int accIndex, BigDecimal amount) {
-        Account acc = accountRepo.save(ACCOUNTS.get(accIndex));
+    void changeTotal(Account acc, BigDecimal amount) {
+        accountRepo.save(acc);
         long accId = acc.getId();
-
         BigDecimal totalBefore = getTotalById(accId);
 
-        int res = accountRepo.changeTotal(amount, accId);
-        System.out.println(res);
+        int affectedRow = accountRepo.changeTotal(amount, accId);
 
-        entityManager.clear();
+        em.clear();
+        assertEquals(1, affectedRow);
         BigDecimal totalAfter = getTotalById(accId);
         BigDecimal totalExpected = totalBefore.add(amount);
-        assertThat(totalExpected, comparesEqualTo(totalAfter));
+        assertThat(totalExpected).isEqualByComparingTo(totalAfter);
     }
-
     @Test
     @Transactional
-    void test_changeTotal_affectedRows() {
-        accountRepo.saveAll(ACCOUNTS);
-
-        List<Account> accs = accountRepo.findAll();
-        long delAccId = accs.get(0).getId();
-
-        int affectedRows = accountRepo.changeTotal(ONE, delAccId);
-        assertEquals(1, affectedRows);
-
-        accountRepo.deleteById(delAccId);
-        affectedRows = accountRepo.changeTotal(ONE, delAccId);
-        assertEquals(0, affectedRows);
+    void changeTotal_on_non_exist_account(){
+        int affectedRow = accountRepo.changeTotal(TEN, Long.MIN_VALUE);
+        assertEquals(0, affectedRow);
     }
+    @ParameterizedTest
+    @MethodSource("invalidAmountsTransaction")
+    @Transactional
+    void changeTotal_bad_amount_trigger_total_constraint(BigDecimal invalidAmount){
+        Account acc = accountRepo.save(new Account(null, TEN, "EUR", "a@a.com"));
+
+        assertThrows(
+            DataIntegrityViolationException.class,
+            () -> accountRepo.changeTotal(invalidAmount, acc.getId())
+        );
+    }
+
 
     private BigDecimal getTotalById(long accId){
         Account account = accountRepo.findById(accId).orElseThrow();
         return account.getTotal();
+    }
+
+    static Stream<Account> invalidAccounts() {
+        return Stream.of(
+                new Account(null, null, "THB", "a@a.com"),
+                new Account(null, TEN, null, "a@a.com"),
+                new Account(null, TEN, "THB", null),
+                new Account(null, TEN, "THB", ""),
+                new Account(null, TEN, "THB", "      "),
+                new Account(null, TEN, "THB", "a@"),
+                new Account(null, TEN, "THB", "a@acom")
+        );
+    }
+    static Stream<Arguments> validTransaction() {
+        return Stream.of(
+                arguments(
+                        new Account(null, TEN, "THB", "a@a.com"),
+                        BigDecimal.valueOf(50)
+                ),
+                arguments(
+                        new Account(null, BigDecimal.valueOf(50000.0), "USD", "a@a.com"),
+                        BigDecimal.valueOf(-50)
+                )
+        );
+    }
+    static Stream<BigDecimal> invalidAmountsTransaction() {
+        return Stream.of(null, BigDecimal.valueOf(-999999));
     }
 }

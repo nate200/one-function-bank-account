@@ -6,6 +6,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import simple.account.demo.exception.BadRequestParameterException;
 import simple.account.demo.model.Account;
 import simple.account.demo.repository.AccountRepository;
 
@@ -13,8 +14,6 @@ import java.math.BigDecimal;
 import java.util.Optional;
 
 import static java.math.BigDecimal.*;
-
-import static org.assertj.core.api.Assertions.*;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
@@ -38,97 +37,100 @@ class AccountServiceTest {
     @InjectMocks
     AccountService service;
 
+    final long DEFAULT_ACCID = 1L;
+    final Account DEFAULT_ACCOUNT = new Account(null, ZERO, "THB", "a@a.com");
+
     @Test
-    void save_one_account(){
-        long accId = 50000L;
-        Account expected = new Account(accId, ZERO, "THB");
-        given(repo.save(any(Account.class))).willReturn(expected);
+    void saveAccount(){
+        given(repo.save(any(Account.class))).willReturn(DEFAULT_ACCOUNT);
 
-        var savedAccount = service.saveAccount(new Account(
-            expected.getId(),
-            expected.getTotal(),
-            expected.getCurrency()
-        ));
+        service.createAccountRequest(DEFAULT_ACCOUNT);
 
-        assertThat(savedAccount).isNotNull();
-        assertThat(savedAccount).usingRecursiveComparison().isEqualTo(expected);
         verify(repo, times(1)).save(any(Account.class));
     }
     @Test
-    void saveAccount_fail_saving_duplicate_id(){
-        long accId = 50000L;
-        Account acc = new Account(accId, ZERO, "THB");
-        given(repo.findById(anyLong())).willReturn(Optional.of(acc));
-        /*force [... = accountRepo.findById(account.getId());] in service.saveAccount(...) to return Optional,
-        which triggers the if(savedAcc.isPresent()) and throw the exception.
-        skip db search, because this is mocking
-        https://1kevinson.com/content/images/size/w1600/2022/08/Screenshot-2022-08-22-at-22.37.57.png*/
-
-        IllegalArgumentException error = assertThrows(
-            IllegalArgumentException.class,
-            () -> service.saveAccount(
-                new Account( acc.getId(), acc.getTotal(), acc.getCurrency()))
+    void saveAccount_null(){
+        assertThrows(
+                NullPointerException.class,
+                () -> service.createAccountRequest(null)
         );
-
-        assertEquals("Account already exist with given Id:" + acc.getId(), error.getMessage());
         verify(repo, never()).save(any(Account.class));
-        //verify(repo, times(1)).save(any(Account.class)); //use this and the test will fail, which is intended and correct
-    }
-
-    @Test
-    void get_account() {
-        long accId = 1L;
-        var expected = new Account(accId, ZERO, "THB");
-        given(repo.findById(anyLong())).willReturn(Optional.of(expected));
-
-        var actual = service.getAccountById(accId);
-
-        assertThat(actual).usingRecursiveComparison().isEqualTo(expected);
-        verify(repo, times(1)).findById(accId);
-        verifyNoMoreInteractions(repo);
     }
     @Test
-    void get_account_not_exist(){
-        long accId = Long.MAX_VALUE;
-        given(repo.findById(accId)).willReturn(Optional.empty());
-        //force repo.findById(accId) in service.getAccountById(...) to return Optional.empty() which triggers orElseThrow
+    void saveAccount_already_exist(){
+        Account savedAcc = DEFAULT_ACCOUNT.toBuilder().id(DEFAULT_ACCID).build();
+        given(repo.findByEmail(any(String.class))).willReturn(Optional.of(savedAcc));
 
-        EntityNotFoundException error = assertThrows(
-                EntityNotFoundException.class,
-                () -> service.getAccountById(accId)
+        assertThrows(
+            BadRequestParameterException.class,
+            () -> service.createAccountRequest(DEFAULT_ACCOUNT)
         );
-        assertEquals("no account id:" + accId, error.getMessage());
+
+        verify(repo, never()).save(any(Account.class));
     }
 
-    @Test
-    void get_currency_of_account_by_id(){
-        long accId = 50000L;
-        Account expectedAcc = new Account(accId, ZERO, "THB");
-        given(repo.findById(accId)).willReturn(Optional.of(expectedAcc));
 
-        String actualCurr = service.getAccountCurrency(accId);
+    @Test
+    void getAccountById() {
+        given(repo.findById(anyLong())).willReturn(Optional.of(DEFAULT_ACCOUNT));
+
+        service.getAccountById(DEFAULT_ACCID);
+
+        verify(repo, times(1)).findById(anyLong());
+    }
+    @Test
+    void getAccountById_not_exist(){
+        given(repo.findById(anyLong())).willReturn(Optional.empty());
+
+        assertThrows(
+                EntityNotFoundException.class,
+                () -> service.getAccountById(DEFAULT_ACCID)
+        );
+    }
+
+
+    @Test
+    void getAccountCurrency(){
+        Account expectedAcc = DEFAULT_ACCOUNT.toBuilder().id(DEFAULT_ACCID).build();
+        given(repo.findById(expectedAcc.getId())).willReturn(Optional.of(expectedAcc));
+
+        String actualCurr = service.getAccountRawCurrency(expectedAcc.getId());
         assertEquals(expectedAcc.getCurrency(), actualCurr);
     }
     @Test
-    void get_currency_of_non_exist_account(){
-        long accId = Long.MAX_VALUE;
-        given(repo.findById(accId)).willReturn(Optional.empty());
-        //force repo.findById(accId) in service.getAccountById(...) to return Optional.empty() which triggers orElseThrow
+    void getAccountCurrency_non_exist_account(){
+        given(repo.findById(DEFAULT_ACCID)).willReturn(Optional.empty());
 
-        EntityNotFoundException error = assertThrows(
+        assertThrows(
                 EntityNotFoundException.class,
-                () -> service.getAccountCurrency(accId)
+                () -> service.getAccountRawCurrency(DEFAULT_ACCID)
         );
-        assertEquals("no account id:" + accId, error.getMessage());
     }
+
 
     @Test
     void changeTotal(){
-        long accId = 50000L;
         given(repo.changeTotal(any(BigDecimal.class), anyLong())).willReturn(1);
 
-        service.changeTotal(TEN, accId);
+        service.changeTotal(TEN, DEFAULT_ACCID);
 
         verify(repo, times(1)).changeTotal(any(BigDecimal.class), anyLong());
+    }
+    @Test
+    void changeTotal_null_amount(){
+        assertThrows(
+                NullPointerException.class,
+                () -> service.changeTotal(null, DEFAULT_ACCID)
+        );
+        verify(repo, never()).changeTotal(any(BigDecimal.class), anyLong());
+    }
+    @Test
+    void changeTotal_non_exist_account(){
+        given(repo.changeTotal(any(BigDecimal.class), anyLong())).willReturn(0);
+
+        assertThrows(
+                EntityNotFoundException.class,
+                () -> service.changeTotal(TEN, DEFAULT_ACCID)
+        );
     }
 }
