@@ -22,6 +22,11 @@ public class TransactionController {
     TransferManager transferManager;
 
     @PostMapping("transfer-with-in-app")
+    @io.swagger.v3.oas.annotations.parameters.RequestBody(
+            description = "Transaction object. Include only these given fields, other fields will be ignored",
+            content = @Content(examples = {@ExampleObject(value = "{ \"currency\": \"CHF\", \"fromAcc\": 1, \"toAcc\": 2, \"amount\": 50.0 }")},
+                    schema = @Schema(implementation = Transaction.class),
+                    mediaType = MediaType.APPLICATION_JSON_VALUE))
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200",
                     description = "return a message if everything went ok",
