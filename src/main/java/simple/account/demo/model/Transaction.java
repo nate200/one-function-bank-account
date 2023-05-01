@@ -3,8 +3,11 @@ package simple.account.demo.model;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
 import lombok.*;
+import org.springframework.data.annotation.CreatedDate;
+import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import java.math.BigDecimal;
+import java.util.Date;
 
 @Data
 @AllArgsConstructor
@@ -13,6 +16,7 @@ import java.math.BigDecimal;
 
 @Entity
 @Table(name = "TRANSACTION")
+@EntityListeners(AuditingEntityListener.class)
 public class Transaction {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -28,6 +32,11 @@ public class Transaction {
     @NotNull @Enumerated(EnumType.STRING)
     @NotNull TransactionStatus transaction_status;
     @NotNull String transaction_result;
+
+    @CreatedDate
+    @Temporal(TemporalType.TIMESTAMP)
+    @Column(name = "create_time")
+    Date createTime;
 }
 /*
 CREATE TABLE TRANSACTION (

@@ -30,7 +30,7 @@ class TransferManagerTest {
     @Mock TransactionService transactionService;
     @InjectMocks TransferManager transferManager;
 
-    static final Transaction DEFAULT_TRANSACTION = new Transaction(null,"USD", 1L, 2L, TEN, null, null);
+    static final Transaction DEFAULT_TRANSACTION = new Transaction(null,"USD", 1L, 2L, TEN, null, null, null);
 
     @Test
     void transferToWithInApp_success() throws Exception {

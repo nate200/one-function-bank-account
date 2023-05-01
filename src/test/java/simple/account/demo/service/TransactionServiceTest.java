@@ -30,7 +30,7 @@ class TransactionServiceTest {
     @InjectMocks
     TransactionService service;
 
-    static final Transaction DEFAULT_TRANSACTION = new Transaction(null, "THB", 1L, 2L, TEN, null,null);
+    static final Transaction DEFAULT_TRANSACTION = new Transaction(null, "THB", 1L, 2L, TEN, null,null, null);
 
     @Test
     void saveTransaction(){
