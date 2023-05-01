@@ -1,31 +1,27 @@
 package simple.account.demo.service;
 
 import jakarta.persistence.EntityNotFoundException;
-import jakarta.validation.ConstraintViolationException;
+import lombok.AllArgsConstructor;
 import lombok.NonNull;
-import lombok.RequiredArgsConstructor;
+
 import org.springframework.stereotype.Service;
-import simple.account.demo.exception.BadRequestParameterException;
+import org.springframework.transaction.annotation.Transactional;
 import simple.account.demo.model.Transaction;
 import simple.account.demo.repository.TransactionRepository;
 
-import java.util.Objects;
+import static java.util.Objects.requireNonNull;
 
 @Service
-@RequiredArgsConstructor
+@AllArgsConstructor
 public class TransactionService {
     TransactionRepository transactionRepo;
 
-    public Transaction saveTransactionRequest(@NonNull Transaction transaction){
-        try {
-            transaction.setTransactionId(null);
-            return transactionRepo.save(transaction);
-        }
-        catch (ConstraintViolationException e){
-            throw new BadRequestParameterException("Can't process invalid: " + transaction);
-        }
+    public Transaction saveNewTransaction(@NonNull Transaction transaction){
+        transaction.setTransactionId(null);
+        return transactionRepo.save(transaction);
     }
 
+    @Transactional
     public void updateStatus(@NonNull Transaction transaction){
         checkTransactionBeforeUpdatingStatus(transaction);
 
@@ -39,15 +35,8 @@ public class TransactionService {
             throw new EntityNotFoundException("can't update non existing transaction with id: " + transaction.getTransactionId());
     }
     private void checkTransactionBeforeUpdatingStatus(Transaction transaction) {
-        String errMsg = null;
-        if(transaction.getTransactionId() == null)
-            errMsg = "id must not be null when updating transaction status";
-        else if(transaction.getTransaction_status() == null)
-            errMsg = "Transaction_status must not be null when updating transaction status";
-        else if(transaction.getTransaction_result() == null)
-            errMsg = "Transaction_result must not be null when updating transaction status";
-
-        if(errMsg != null)
-            throw new NullPointerException(errMsg);
+        requireNonNull(transaction.getTransactionId(), "Transaction.id must not be null when updating transaction status");
+        requireNonNull(transaction.getTransaction_status(),"Transaction.transaction_status must not be null when updating transaction status");
+        requireNonNull(transaction.getTransaction_result(), "Transaction.transaction_result must not be null when updating transaction status");
     }
 }

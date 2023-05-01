@@ -1,18 +1,19 @@
 package simple.account.demo.service;
 
+import jakarta.persistence.EntityNotFoundException;
 import lombok.AllArgsConstructor;
 import lombok.NonNull;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import simple.account.demo.exception.BadRequestParameterException;
-import simple.account.demo.util.CurrencyUtil;
-import simple.account.demo.util.ExchangeRateApi;
+import simple.account.demo.exception.business.BadRequestParameterException;
+import simple.account.demo.exception.business.UnprocessableContentException;
 import simple.account.demo.model.Transaction;
 import simple.account.demo.model.TransactionStatus;
+import simple.account.demo.util.CurrencyUtil;
+import simple.account.demo.util.ExchangeRateApi;
 
 import java.math.BigDecimal;
 import java.util.Currency;
-import java.util.Objects;
 
 @Service
 @AllArgsConstructor
@@ -22,32 +23,35 @@ public class TransferManager {
     TransactionService transactionService;
 
     public void transferWithInApp(@NonNull Transaction transaction) throws Exception {
+        Transaction processingTransaction = transaction.toBuilder().build();
+
+        processingTransaction.setTransaction_status(TransactionStatus.PROCESSING);
+        processingTransaction.setTransaction_result("plz wait");
+        transactionService.saveNewTransaction(processingTransaction);
+
         try{
-            transaction.setTransaction_status(TransactionStatus.PROCESSING);
-            transaction.setTransaction_result("plz wait");
-            transactionService.saveTransactionRequest(transaction);
+            validateTransaction(processingTransaction);
+            transferBetweenAccounts(processingTransaction);
 
-            validateTransaction(transaction);
-            transferBetweenAccounts(transaction);
-
-            transaction.setTransaction_status(TransactionStatus.DONE);
-            transaction.setTransaction_result("done");
+            processingTransaction.setTransaction_status(TransactionStatus.DONE);
+            processingTransaction.setTransaction_result("done");
         }
         catch (Exception e){
-            transaction.setTransaction_status(TransactionStatus.FAIL);
-            transaction.setTransaction_result(e.getMessage());
+            processingTransaction.setTransaction_status(TransactionStatus.FAIL);
+            processingTransaction.setTransaction_result(e.getMessage());
             throw e;
         }
         finally {
-            transactionService.updateStatus(transaction);
+            transactionService.updateStatus(processingTransaction);
         }
     }
+
     @Transactional
     private void transferBetweenAccounts(Transaction transaction) throws Exception
     {
         System.out.println("transaction: " + transaction);
 
-        Currency currencyTran = CurrencyUtil.getCurrencyFromString(transaction.getCurrency());
+        Currency currencyTran = getSupportedCurrency(transaction.getCurrency());
         Currency currencyFrom = getAccountCurrency(transaction.getFromAcc());
         Currency currencyTo = getAccountCurrency(transaction.getToAcc());
 
@@ -58,6 +62,7 @@ public class TransferManager {
         accountService.changeTotal(convertedWithdraw.negate(), transaction.getFromAcc());
         accountService.changeTotal(convertedTransfer, transaction.getToAcc());
     }
+
     private void validateTransaction(Transaction transaction){
         String errorMsg = null;
         if(transaction.getToAcc() == transaction.getFromAcc())
@@ -69,8 +74,22 @@ public class TransferManager {
             throw new BadRequestParameterException(errorMsg);
     }
 
+    private Currency getSupportedCurrency(String rawCurrency){
+        try{ return CurrencyUtil.getCurrencyFromString(rawCurrency);}
+        catch (Exception e){
+            throw new BadRequestParameterException(e.getMessage());
+        }
+    }
     private Currency getAccountCurrency(long accId){
-        String currency = accountService.getAccountRawCurrency(accId);
-        return CurrencyUtil.getCurrencyFromString(currency);
+        try{
+            String rawCurrency = accountService.getAccountRawCurrency(accId);
+            return CurrencyUtil.getCurrencyFromString(rawCurrency);
+        }
+        catch (IllegalArgumentException e){
+            throw new UnprocessableContentException("Account id: " + accId + " has invalid currency");
+        }
+        catch (EntityNotFoundException e){
+            throw new UnprocessableContentException("Account id: " + accId + " doesn't exist, Transaction cancelled");
+        }
     }
 }

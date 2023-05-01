@@ -23,6 +23,4 @@ public class AccountController {
     public Account getAccount(@PathVariable("accId") long accId) {
         return accountService.getAccountById(accId);
     }
-
-
 }

@@ -29,16 +29,17 @@ public class Account {
     String currency;
 
     @NotNull
-    @Email(regexp = ".+\\@.+\\..+")//simple, for now
+    @Email(regexp = "^[A-Za-z0-9+_.-]+@[A-Za-z0-9+_.-]+\\.(.+)$")//simple, for now
     String email;
 }
 
 /*CREATE TABLE ACCOUNT (
     id serial PRIMARY KEY,
     total DECIMAL NOT NULL CHECK ( total >= 0),
-    currency VARCHAR ( 10 ) NOT NULL
+    currency VARCHAR ( 10 ) NOT NULL,
+    email VARCHAR ( 50 ) NOT NULL
 );
 
-INSERT INTO ACCOUNT(id, total, currency) VALUES(1,50.0,'THB');
-INSERT INTO ACCOUNT(id, total, currency) VALUES(2,50000.0,'USD');
+INSERT INTO ACCOUNT(id, total, currency, email) VALUES(1,50.0,'THB', "a@a.com");
+INSERT INTO ACCOUNT(id, total, currency, email) VALUES(2,50000.0,'USD', "a@a.com");
 */

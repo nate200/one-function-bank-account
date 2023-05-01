@@ -23,14 +23,16 @@ public class Transaction {
     @Column(name = "transaction_id")
     Long transactionId;
 
-    @NotNull String currency;
+    String currency;
     @Column(name = "from_acc")
-    @NotNull long fromAcc;
+    long fromAcc;
     @Column(name = "to_acc")
-    @NotNull long toAcc;
-    @NotNull BigDecimal amount;
-    @NotNull @Enumerated(EnumType.STRING)
+    long toAcc;
+    BigDecimal amount;
+
+    @Enumerated(EnumType.STRING)
     @NotNull TransactionStatus transaction_status;
+
     @NotNull String transaction_result;
 
     @CreatedDate

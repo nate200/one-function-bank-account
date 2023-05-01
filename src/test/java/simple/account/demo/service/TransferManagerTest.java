@@ -8,6 +8,7 @@ import org.junit.jupiter.params.provider.MethodSource;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import simple.account.demo.exception.business.BadRequestParameterException;
 import simple.account.demo.util.ExchangeRateApi;
 import simple.account.demo.model.Transaction;
 
@@ -40,7 +41,7 @@ class TransferManagerTest {
 
         transferManager.transferWithInApp(DEFAULT_TRANSACTION);
 
-        verify(transactionService, times(1)).saveTransactionRequest(any(Transaction.class));
+        verify(transactionService, times(1)).saveNewTransaction(any(Transaction.class));
         verify(accountService, times(2)).changeTotal(any(BigDecimal.class), anyLong());
         verify(transactionService, times(1)).updateStatus(any(Transaction.class));
     }
@@ -60,7 +61,7 @@ class TransferManagerTest {
     @MethodSource("badTransactions")
     void validateTransaction(Transaction badTransaction) {
         assertThrows(
-                Exception.class,
+                BadRequestParameterException.class,
                 () -> transferManager.transferWithInApp(badTransaction)
         );
         verifyNoInteractions(accountService);
@@ -113,9 +114,13 @@ class TransferManagerTest {
     static Stream<Transaction> badTransactions(){
         return Stream.of(
                 DEFAULT_TRANSACTION.toBuilder().currency(null).build(),
+                DEFAULT_TRANSACTION.toBuilder().currency("  TH B").build(),
+                DEFAULT_TRANSACTION.toBuilder().currency("").build(),
+                DEFAULT_TRANSACTION.toBuilder().currency("    ").build(),
                 DEFAULT_TRANSACTION.toBuilder().amount(null).build(),
-                DEFAULT_TRANSACTION.toBuilder().fromAcc(DEFAULT_TRANSACTION.getToAcc()).build(),
-                DEFAULT_TRANSACTION.toBuilder().amount(ZERO).build()
+                DEFAULT_TRANSACTION.toBuilder().amount(ZERO).build(),
+                DEFAULT_TRANSACTION.toBuilder().amount(TEN.negate()).build(),
+                DEFAULT_TRANSACTION.toBuilder().fromAcc(DEFAULT_TRANSACTION.getToAcc()).build()
         );
     }
 }

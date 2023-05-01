@@ -8,12 +8,10 @@ import org.junit.jupiter.params.provider.MethodSource;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import simple.account.demo.exception.BadRequestParameterException;
 import simple.account.demo.model.Transaction;
 import simple.account.demo.model.TransactionStatus;
 import simple.account.demo.repository.TransactionRepository;
 
-import java.util.Optional;
 import java.util.stream.Stream;
 
 import static java.math.BigDecimal.TEN;
@@ -36,7 +34,7 @@ class TransactionServiceTest {
     void saveTransaction(){
         given(repo.save(any(Transaction.class))).willReturn(DEFAULT_TRANSACTION);
 
-        service.saveTransactionRequest(DEFAULT_TRANSACTION);
+        service.saveNewTransaction(DEFAULT_TRANSACTION);
 
         verify(repo, times(1)).save(any(Transaction.class));
     }
@@ -44,7 +42,7 @@ class TransactionServiceTest {
     void saveTransaction_null(){
         assertThrows(
                 NullPointerException.class,
-                () -> service.saveTransactionRequest(null)
+                () -> service.saveNewTransaction(null)
         );
         verify(repo, never()).save(any(Transaction.class));
     }
