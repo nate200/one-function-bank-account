@@ -4,15 +4,15 @@ spring:
   jpa:
     database: POSTGRESQL
     show-sql: true
-      #hibernate:
-    #ddl-auto: create-drop
+    hibernate:
+      ddl-auto: update
   datasource:
     platform: postgres
     driverClassName: org.postgresql.Driver
-    url: postgres-url and port
-    username: your postgres username
-    password: password ;)
+    url: ${POSTGRESDB_URL}
+    username: ${POSTGRESDB_TEST_USER}
+    password: ${POSTGRESDB_TEST_PASS}
 
 exchangerate-api:
-  apikey: apikey from the dashboard ;))))
+  apikey: ${EXCHANGERATEAPI_APIKEY}
   convert-endpoint: https://v6.exchangerate-api.com/v6/${exchangerate-api.apikey}/pair/
