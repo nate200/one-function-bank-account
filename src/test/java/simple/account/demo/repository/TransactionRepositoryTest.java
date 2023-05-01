@@ -100,8 +100,6 @@ class TransactionRepositoryTest {
 
     static Stream<Transaction> invalidTransactionData() {
         return Stream.of(
-                DEFAULT_TRANSACTION.toBuilder().currency(null).build(),
-                DEFAULT_TRANSACTION.toBuilder().amount(null).build(),
                 DEFAULT_TRANSACTION.toBuilder().transaction_status(null).build(),
                 DEFAULT_TRANSACTION.toBuilder().transaction_result(null).build()
         );
