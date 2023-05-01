@@ -23,7 +23,6 @@ public class TransferManager {
 
     public void transferWithInApp(@NonNull Transaction transaction) throws Exception {
         try{
-            transaction.setTransactionId(null);
             transaction.setTransaction_status(TransactionStatus.PROCESSING);
             transaction.setTransaction_result("plz wait");
             transactionService.saveTransactionRequest(transaction);

@@ -39,17 +39,15 @@ public class TransactionService {
             throw new EntityNotFoundException("can't update non existing transaction with id: " + transaction.getTransactionId());
     }
     private void checkTransactionBeforeUpdatingStatus(Transaction transaction) {
-        Objects.requireNonNull(
-                transaction.getTransactionId(),
-                "id must not be null when updating transaction status"
-        );
-        Objects.requireNonNull(
-                transaction.getTransaction_status(),
-                "Transaction_status must not be null when updating transaction status"
-        );
-        Objects.requireNonNull(
-                transaction.getTransaction_result(),
-                "Transaction_result must not be null when updating transaction status"
-        );
+        String errMsg = null;
+        if(transaction.getTransactionId() == null)
+            errMsg = "id must not be null when updating transaction status";
+        else if(transaction.getTransaction_status() == null)
+            errMsg = "Transaction_status must not be null when updating transaction status";
+        else if(transaction.getTransaction_result() == null)
+            errMsg = "Transaction_result must not be null when updating transaction status";
+
+        if(errMsg != null)
+            throw new NullPointerException(errMsg);
     }
 }
