@@ -29,8 +29,10 @@ public class Transaction {
     @Column(name = "to_acc")
     long toAcc;
     BigDecimal amount;
-    @NotNull @Enumerated(EnumType.STRING)
+
+    @Enumerated(EnumType.STRING)
     @NotNull TransactionStatus transaction_status;
+
     @NotNull String transaction_result;
 
     @CreatedDate

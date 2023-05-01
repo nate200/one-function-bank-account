@@ -34,7 +34,7 @@ class TransactionServiceTest {
     void saveTransaction(){
         given(repo.save(any(Transaction.class))).willReturn(DEFAULT_TRANSACTION);
 
-        service.saveTransactionRequest(DEFAULT_TRANSACTION);
+        service.saveNewTransaction(DEFAULT_TRANSACTION);
 
         verify(repo, times(1)).save(any(Transaction.class));
     }
@@ -42,7 +42,7 @@ class TransactionServiceTest {
     void saveTransaction_null(){
         assertThrows(
                 NullPointerException.class,
-                () -> service.saveTransactionRequest(null)
+                () -> service.saveNewTransaction(null)
         );
         verify(repo, never()).save(any(Transaction.class));
     }
