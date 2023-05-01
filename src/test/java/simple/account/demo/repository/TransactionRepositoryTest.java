@@ -9,9 +9,9 @@ import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.boot.test.autoconfigure.orm.jpa.TestEntityManager;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.data.jpa.repository.config.EnableJpaAuditing;
+import simple.account.demo.RecursiveCompareWithBigDecimal;
 import simple.account.demo.model.Transaction;
 
-import java.math.BigDecimal;
 import java.util.List;
 import java.util.stream.Stream;
 
@@ -51,11 +51,7 @@ class TransactionRepositoryTest {
         List<Transaction> transactions = transactionRepo.findAll();
         assertEquals(2,transactions.size());
         Transaction actual = transactions.get(0);
-        assertThat(actual)
-            .usingComparatorForType(BigDecimal::compareTo, BigDecimal.class)
-            .hasNoNullFieldsOrProperties()//assertNotNull(actual.getCreateTime());//need @EnableJpaAuditing and @EntityListeners(AuditingEntityListener.class)
-            .usingRecursiveComparison()
-            .isEqualTo(expected);
+        RecursiveCompareWithBigDecimal.compareNoNull(expected, actual);
     }
     @ParameterizedTest
     @MethodSource("invalidTransactionData")
@@ -83,11 +79,7 @@ class TransactionRepositoryTest {
         assertEquals(1, affectedRows);
         Transaction actualTransaction = transactionRepo.findById(initTransaction.getTransactionId()).get();
         expectedTransaction.setCreateTime(actualTransaction.getCreateTime());
-        assertThat(actualTransaction)
-            .usingComparatorForType(BigDecimal::compareTo, BigDecimal.class)//https://stackoverflow.com/questions/63714635/assertj-fails-to-assert-bigdecimal-equality-without-scale
-            .hasNoNullFieldsOrProperties()
-            .usingRecursiveComparison()
-            .isEqualTo(expectedTransaction);
+        RecursiveCompareWithBigDecimal.compareNoNull(expectedTransaction, actualTransaction);
     }
     @ParameterizedTest
     @MethodSource("invalidUpdateStatusData")
