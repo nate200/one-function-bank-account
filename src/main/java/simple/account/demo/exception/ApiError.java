@@ -11,12 +11,12 @@ import java.time.LocalDateTime;
 
 @ToString
 @JsonInclude(Include.NON_EMPTY)
-//@Getter//json output field
+@Getter//json output field and swagger schema
 public class ApiError {//https://www.toptal.com/java/spring-boot-rest-api-error-handling
     private HttpStatus status;
     private String message;
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "dd-MM-yyyy hh:mm:ss")
-    private LocalDateTime timestamp;
+    final private LocalDateTime timestamp;
 
     private ApiError() {
         timestamp = LocalDateTime.now();
