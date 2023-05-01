@@ -11,7 +11,6 @@ public class TestDataProvider {
     static Stream<Account> validAccounts(){
         return Stream.of(
                 Account.builder().total(ZERO).currency("THB").email("a@a.com").build(),
-                Account.builder().total(TEN.negate()).currency("THB").email("a@a.com").build(),
                 Account.builder().total(TEN).currency("THB").email("a@a.com").build(),
                 Account.builder().total(TEN).currency("     THB").email("a@a.com").build(),
                 Account.builder().total(TEN).currency("THB       ").email("a@a.com").build(),
