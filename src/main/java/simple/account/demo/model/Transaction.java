@@ -1,5 +1,6 @@
 package simple.account.demo.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
 import lombok.*;
@@ -18,6 +19,7 @@ import java.util.Date;
 @Table(name = "TRANSACTION")
 @EntityListeners(AuditingEntityListener.class)
 public class Transaction {
+    @JsonIgnore
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "transaction_id")
@@ -30,11 +32,14 @@ public class Transaction {
     long toAcc;
     BigDecimal amount;
 
+    @JsonIgnore//hide from swagger schema
     @Enumerated(EnumType.STRING)
     @NotNull TransactionStatus transaction_status;
 
+    @JsonIgnore
     @NotNull String transaction_result;
 
+    @JsonIgnore
     @CreatedDate
     @Temporal(TemporalType.TIMESTAMP)
     @Column(name = "create_time")
