@@ -1,15 +1,13 @@
-package omg.simple.account.core;
+package omg.simple.account.security;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
-import org.springframework.cache.annotation.EnableCaching;
 
 @SpringBootApplication
-@EnableCaching
-public class DemoApplication {
+public class JwtdemoApplication {
 
 	public static void main(String[] args) {
-		SpringApplication.run(DemoApplication.class, args);
+		SpringApplication.run(JwtdemoApplication.class, args);
 	}
 
 }

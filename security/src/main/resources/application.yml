@@ -1,0 +1,15 @@
+spring:
+  datasource:
+    url: jdbc:postgresql://localhost:5432/test
+    username: postgres
+    password: P@ssw0rd
+  jpa:
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.PostgreSQLDialect
+    hibernate:
+      show-sql: 'true'
+      ddl-auto: update
+      
+      
+jwt-key: 4B6250655368566D597133743677397A24432646294A404D635166546A576E5A

@@ -18,7 +18,7 @@
 
     <modules>
         <module>core</module>
-        <!--module>security</module-->
+        <module>security</module>
     </modules>
 
     <properties>
@@ -60,7 +60,7 @@
             <artifactId>spring-boot-starter-aop</artifactId>
         </dependency>
 
-        <!--dependency>
+        <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-security</artifactId>
         </dependency>
@@ -68,7 +68,7 @@
             <groupId>org.springframework.security</groupId>
             <artifactId>spring-security-test</artifactId>
             <scope>test</scope>
-        </dependency-->
+        </dependency>
 
         <dependency>
             <groupId>org.projectlombok</groupId>
@@ -133,11 +133,11 @@
                 <artifactId>core</artifactId>
                 <version>${core.version}</version>
             </dependency>
-            <!--dependency>
+            <dependency>
                 <groupId>omg.simple.account</groupId>
                 <artifactId>security</artifactId>
                 <version>${security.version}</version>
-            </dependency-->
+            </dependency>
 
             <dependency>
                 <groupId>com.google.code.gson</groupId>
