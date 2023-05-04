@@ -11,7 +11,7 @@ import java.time.LocalDateTime;
 
 @ToString
 @JsonInclude(Include.NON_EMPTY)
-//@Getter//json output field
+@Getter//json output field
 public class ApiError {//https://www.toptal.com/java/spring-boot-rest-api-error-handling
     private HttpStatus status;
     private String message;
