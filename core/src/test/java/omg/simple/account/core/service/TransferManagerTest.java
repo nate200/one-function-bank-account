@@ -10,7 +10,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import omg.simple.account.core.util.ExchangeRateApi;
-import omg.simple.account.core.model.Transaction;
+import omg.simple.account.core.model.business.Transaction;
 
 import java.io.IOException;
 import java.math.BigDecimal;

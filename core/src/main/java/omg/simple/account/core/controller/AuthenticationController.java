@@ -1,10 +1,10 @@
-package omg.simple.account.security.controller;
+package omg.simple.account.core.controller;
 
 import lombok.AllArgsConstructor;
-import omg.simple.account.security.model.security.AuthenticationRequest;
-import omg.simple.account.security.model.security.AuthenticationResponse;
-import omg.simple.account.security.model.security.RegisterRequest;
-import omg.simple.account.security.service.AuthenticationService;
+import omg.simple.account.core.model.api.AuthenticationRequest;
+import omg.simple.account.core.model.api.AuthenticationResponse;
+import omg.simple.account.core.model.api.RegisterRequest;
+import omg.simple.account.core.service.AuthenticationService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -14,20 +14,19 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 @AllArgsConstructor
 @RequestMapping("/auth")
-public class AuthController {
-
+public class AuthenticationController {
     AuthenticationService authService;
-    
+
     @PostMapping("/register")
     public ResponseEntity<AuthenticationResponse> register(
-        @RequestBody RegisterRequest request
+            @RequestBody RegisterRequest request
     ) {
-      return ResponseEntity.ok(authService.register(request));
+        return ResponseEntity.ok(authService.register(request));
     }
     @PostMapping("/authenticate")
     public ResponseEntity<AuthenticationResponse> authenticate(
-        @RequestBody AuthenticationRequest request
+            @RequestBody AuthenticationRequest request
     ) {
-      return ResponseEntity.ok(authService.authenticate(request));
+        return ResponseEntity.ok(authService.authenticate(request));
     }
 }

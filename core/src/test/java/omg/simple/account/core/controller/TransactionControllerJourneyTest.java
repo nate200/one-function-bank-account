@@ -8,12 +8,13 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
-import omg.simple.account.core.model.Account;
-import omg.simple.account.core.model.Transaction;
-import omg.simple.account.core.model.TransactionStatus;
+import omg.simple.account.core.model.business.Account;
+import omg.simple.account.core.model.business.Transaction;
+import omg.simple.account.core.model.constant.TransactionStatus;
 import omg.simple.account.core.repository.AccountRepository;
 import omg.simple.account.core.repository.TransactionRepository;
 
@@ -32,6 +33,9 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.DEFINED_PORT)
 @ExtendWith(MockitoExtension.class)
 class TransactionControllerJourneyTest extends DbTestBase {
+    @Value("${god-token}")
+    String token;
+
     @Autowired
     TransactionRepository tranRepo;
     @Autowired
@@ -56,7 +60,7 @@ class TransactionControllerJourneyTest extends DbTestBase {
         long toAccId = accTHB.getId();
         BigDecimal toAccOldBalance = accTHB.getTotal();
 
-        given()
+        given().auth().oauth2(token)
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
                 .body(Transaction.builder().amount(BigDecimal.valueOf(500.0)).currency("USD").fromAcc(fromAccId).toAcc(toAccId).build())
                 .when().post("/transfer-with-in-app").then()
@@ -86,7 +90,7 @@ class TransactionControllerJourneyTest extends DbTestBase {
         BigDecimal toAccOldBalance = toAcc.getTotal();
         badTransaction.setToAcc(toAccId);
 
-        given()
+        given().auth().oauth2(token)
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
                 .body(badTransaction)
                 .when().post("/transfer-with-in-app").then()
@@ -102,7 +106,7 @@ class TransactionControllerJourneyTest extends DbTestBase {
         long fromAccId = accEUR.getId();
         long toAccId = accEUR.getId();
 
-        given()
+        given().auth().oauth2(token)
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
                 .body(Transaction.builder().amount(BigDecimal.valueOf(500.0)).currency("USD").fromAcc(fromAccId).toAcc(toAccId).build())
                 .when().post("/transfer-with-in-app").then()
@@ -125,7 +129,7 @@ class TransactionControllerJourneyTest extends DbTestBase {
         Account toAcc = accRepo.save(ACC_THB.toBuilder().currency("huh??").build());
         long toAccId = toAcc.getId();
 
-        given()
+        given().auth().oauth2(token)
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
                 .body(Transaction.builder().amount(BigDecimal.valueOf(500.0)).currency("USD").fromAcc(fromAccId).toAcc(toAccId).build())
                 .when().post("/transfer-with-in-app").then()

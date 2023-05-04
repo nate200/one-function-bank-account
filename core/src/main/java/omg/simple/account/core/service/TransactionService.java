@@ -7,7 +7,7 @@ import lombok.NonNull;
 import omg.simple.account.core.repository.TransactionRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import omg.simple.account.core.model.Transaction;
+import omg.simple.account.core.model.business.Transaction;
 
 import static java.util.Objects.requireNonNull;
 

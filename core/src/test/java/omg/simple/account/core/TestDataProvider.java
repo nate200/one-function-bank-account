@@ -1,6 +1,6 @@
 package omg.simple.account.core;
 
-import omg.simple.account.core.model.Account;
+import omg.simple.account.core.model.business.Account;
 
 import java.util.stream.Stream;
 

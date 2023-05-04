@@ -1,5 +1,5 @@
 
-package omg.simple.account.security.model.security;
+package omg.simple.account.core.model.api;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.*;

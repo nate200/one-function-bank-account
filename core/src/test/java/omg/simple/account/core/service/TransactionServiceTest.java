@@ -8,8 +8,8 @@ import org.junit.jupiter.params.provider.MethodSource;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import omg.simple.account.core.model.Transaction;
-import omg.simple.account.core.model.TransactionStatus;
+import omg.simple.account.core.model.business.Transaction;
+import omg.simple.account.core.model.constant.TransactionStatus;
 import omg.simple.account.core.repository.TransactionRepository;
 
 import java.util.stream.Stream;
@@ -19,7 +19,7 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.*;
-import static omg.simple.account.core.model.TransactionStatus.DONE;
+import static omg.simple.account.core.model.constant.TransactionStatus.DONE;
 
 @ExtendWith(MockitoExtension.class)
 class TransactionServiceTest {

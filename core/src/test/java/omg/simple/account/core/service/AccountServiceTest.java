@@ -9,7 +9,7 @@ import org.junit.jupiter.params.provider.MethodSource;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import omg.simple.account.core.model.Account;
+import omg.simple.account.core.model.business.Account;
 import omg.simple.account.core.repository.AccountRepository;
 
 import java.math.BigDecimal;

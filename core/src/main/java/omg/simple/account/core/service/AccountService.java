@@ -7,7 +7,7 @@ import omg.simple.account.core.exception.business.BadRequestParameterException;
 import omg.simple.account.core.repository.AccountRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import omg.simple.account.core.model.Account;
+import omg.simple.account.core.model.business.Account;
 import omg.simple.account.core.util.CurrencyUtil;
 
 import java.math.BigDecimal;

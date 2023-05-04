@@ -7,8 +7,8 @@ import omg.simple.account.core.exception.business.BadRequestParameterException;
 import omg.simple.account.core.exception.business.UnprocessableContentException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import omg.simple.account.core.model.Transaction;
-import omg.simple.account.core.model.TransactionStatus;
+import omg.simple.account.core.model.business.Transaction;
+import omg.simple.account.core.model.constant.TransactionStatus;
 import omg.simple.account.core.util.CurrencyUtil;
 import omg.simple.account.core.util.ExchangeRateApi;
 

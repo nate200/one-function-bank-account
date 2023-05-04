@@ -2,14 +2,18 @@ package omg.simple.account.core.controller;
 
 import omg.simple.account.core.DbTestBase;
 import omg.simple.account.core.RecursiveCompareWithBigDecimal;
+import omg.simple.account.core.config.CoreSecurityComponentConfig;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
+import org.springframework.boot.autoconfigure.security.servlet.SecurityAutoConfiguration;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
-import omg.simple.account.core.model.Account;
+import omg.simple.account.core.model.business.Account;
 import omg.simple.account.core.repository.AccountRepository;
 
 import static io.restassured.RestAssured.given;
@@ -18,9 +22,11 @@ import static org.apache.http.HttpStatus.SC_BAD_REQUEST;
 import static org.apache.http.HttpStatus.SC_OK;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.DEFINED_PORT)//https://stackoverflow.com/questions/32054274/connection-refused-with-rest-assured-junit-test-case
 public class AccountControllerJourneyTest extends DbTestBase {
+
+    @Value("${god-token}")
+    String token;
 
     @Autowired
     AccountRepository accRepo;
@@ -35,7 +41,7 @@ public class AccountControllerJourneyTest extends DbTestBase {
     void createAccount(Account validAccount){
         assertEquals(0,accRepo.count());
 
-        given()
+        given().auth().oauth2(token)
             .contentType(MediaType.APPLICATION_JSON_VALUE)
             .body(validAccount)
             .when().post("/create-account").then()
@@ -46,7 +52,7 @@ public class AccountControllerJourneyTest extends DbTestBase {
     @ParameterizedTest
     @MethodSource("omg.simple.account.core.TestDataProvider#badNewAccountRequest")
     void createAccount_invalidAccount(Account invalidAcc){
-        given()
+        given().auth().oauth2(token)
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
                 .body(invalidAcc)
                 .when().post("/create-account").then()
@@ -55,16 +61,20 @@ public class AccountControllerJourneyTest extends DbTestBase {
 
     @Test
     void getAccount(){
-        Account expected = accRepo.save(Account.builder().total(TEN).currency("THB").email("a@a.com").build());
+        Account expected = accRepo.save(Account.builder().total(TEN).currency("THB").email("admin@admin.com").build());
 
         Account actual = given().when()
+                .auth().oauth2(token)
                 .pathParam("accId", expected.getId())
-                .get("/getAccount/{accId}").as(Account.class);
+                .get("/getAccount/{accId}").then()
+                .statusCode(200)
+                .extract().as(Account.class);
 
         RecursiveCompareWithBigDecimal.compareNoNull(expected, actual);
     }
     @Test
     void getAccount_404(){
-        given().when().get("/getAccount/-1").then().statusCode(404);
+        given().when().auth().oauth2(token)
+                .get("/getAccount/-1").then().statusCode(404);
     }
 }

@@ -1,4 +1,4 @@
-package omg.simple.account.core.model;
+package omg.simple.account.core.model.business;
 
 import jakarta.persistence.*;
 

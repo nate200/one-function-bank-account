@@ -5,7 +5,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
-import omg.simple.account.core.model.Transaction;
+import omg.simple.account.core.model.business.Transaction;
 import omg.simple.account.core.service.TransferManager;
 
 @RestController

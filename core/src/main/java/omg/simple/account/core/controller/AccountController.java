@@ -3,7 +3,7 @@ package omg.simple.account.core.controller;
 import lombok.AllArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import omg.simple.account.core.model.Account;
+import omg.simple.account.core.model.business.Account;
 import omg.simple.account.core.service.AccountService;
 
 @RestController

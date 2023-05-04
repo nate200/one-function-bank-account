@@ -5,7 +5,7 @@ import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
-import omg.simple.account.core.model.Account;
+import omg.simple.account.core.model.business.Account;
 
 import java.math.BigDecimal;
 import java.util.Optional;

@@ -10,7 +10,7 @@ import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.boot.test.autoconfigure.orm.jpa.TestEntityManager;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.data.jpa.repository.config.EnableJpaAuditing;
-import omg.simple.account.core.model.Transaction;
+import omg.simple.account.core.model.business.Transaction;
 
 import java.util.List;
 import java.util.stream.Stream;
@@ -21,7 +21,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.params.provider.Arguments.arguments;
-import static omg.simple.account.core.model.TransactionStatus.*;
+import static omg.simple.account.core.model.constant.TransactionStatus.*;
 
 @DataJpaTest
 @EnableJpaAuditing

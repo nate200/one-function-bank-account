@@ -1,8 +1,9 @@
-package omg.simple.account.core.model;
+package omg.simple.account.core.model.business;
 
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
 import lombok.*;
+import omg.simple.account.core.model.constant.TransactionStatus;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 

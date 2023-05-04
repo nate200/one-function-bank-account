@@ -7,7 +7,6 @@ import org.springframework.context.annotation.ComponentScan;
 
 @SpringBootApplication
 @EnableCaching
-@ComponentScan(basePackages = {"omg.simple.account.security"})
 public class CoreApplication {
 
 	public static void main(String[] args) {

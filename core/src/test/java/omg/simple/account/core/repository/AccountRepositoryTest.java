@@ -10,7 +10,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.transaction.annotation.Transactional;
-import omg.simple.account.core.model.Account;
+import omg.simple.account.core.model.business.Account;
 
 import java.math.BigDecimal;
 import java.util.stream.Stream;

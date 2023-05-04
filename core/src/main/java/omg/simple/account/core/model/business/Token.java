@@ -1,8 +1,8 @@
-package omg.simple.account.security.model.security;
+package omg.simple.account.core.model.business;
 
 import jakarta.persistence.*;
 import lombok.*;
-import omg.simple.account.security.model.UserAccount;
+import omg.simple.account.core.model.constant.TokenType;
 
 @Data
 @Builder

@@ -5,8 +5,8 @@ import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
-import omg.simple.account.core.model.Transaction;
-import omg.simple.account.core.model.TransactionStatus;
+import omg.simple.account.core.model.business.Transaction;
+import omg.simple.account.core.model.constant.TransactionStatus;
 
 @Repository
 public interface TransactionRepository extends JpaRepository<Transaction, Long> {
