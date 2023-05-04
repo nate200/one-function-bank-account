@@ -1,11 +1,7 @@
 package omg.simple.account.core.model.business;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.EnumType;
-import jakarta.persistence.Enumerated;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.Id;
-import jakarta.persistence.Table;
+import jakarta.persistence.*;
+
 import java.util.Collection;
 import java.util.List;
 import lombok.AllArgsConstructor;
@@ -18,7 +14,7 @@ import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
 @Data
-@Builder
+@Builder(toBuilder = true)
 @AllArgsConstructor
 @NoArgsConstructor
 
@@ -26,10 +22,12 @@ import org.springframework.security.core.userdetails.UserDetails;
 @Table(name = "user_account")
 public class UserAccount implements UserDetails {
     @Id
-    @GeneratedValue  
-    Integer id;
-    
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    Long id;
+
+    @Column(unique=true)
     String email;
+
     String fname;
     String lname;
     String passw;
