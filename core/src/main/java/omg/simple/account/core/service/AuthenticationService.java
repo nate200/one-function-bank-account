@@ -1,6 +1,7 @@
 package omg.simple.account.core.service;
 
 import lombok.AllArgsConstructor;
+import omg.simple.account.core.exception.business.BadRequestParameterException;
 import omg.simple.account.core.model.api.AuthenticationRequest;
 import omg.simple.account.core.model.api.AuthenticationResponse;
 import omg.simple.account.core.model.api.RegisterRequest;
@@ -13,8 +14,11 @@ import omg.simple.account.core.repository.UserAccountRepository;
 import omg.simple.account.security.component.JwtUtil;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+
+import java.util.Optional;
 
 @Service
 @AllArgsConstructor
@@ -26,15 +30,19 @@ public class AuthenticationService {
     private final AuthenticationManager authenticationManager;
 
     public AuthenticationResponse register(RegisterRequest request) {
-        var user = UserAccount.builder()
+        Optional<UserAccount> user = userRepo.findByEmail(request.getEmail());
+        if(user.isPresent())
+            throw new BadRequestParameterException("Email:[" + request.getEmail() + "] is already used");
+
+        var newUser = UserAccount.builder()
                 .fname(request.getFirstname())
                 .lname(request.getLastname())
                 .email(request.getEmail())
                 .passw(passwordEncoder.encode(request.getPassword()))
                 .role(Role.USER).build();
-        var savedUser = userRepo.save(user);
+        var savedUser = userRepo.save(newUser);
 
-        var jwtToken = jwtUtil.generateToken(user);
+        var jwtToken = jwtUtil.generateToken(newUser);
         saveUserToken(savedUser, jwtToken);
 
         return AuthenticationResponse.builder()
@@ -50,7 +58,8 @@ public class AuthenticationService {
                 )
         );
 
-        var user = userRepo.findByEmail(request.getEmail()).orElseThrow();
+        var user = userRepo.findByEmail(request.getEmail())
+                .orElseThrow(() -> new UsernameNotFoundException("not user account with email: " + request.getEmail()));
         var jwtToken = jwtUtil.generateToken(user);
 
         revokeAllUserTokens(user);

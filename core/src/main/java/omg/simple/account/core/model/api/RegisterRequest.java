@@ -3,7 +3,7 @@ package omg.simple.account.core.model.api;
 import lombok.*;
 
 @Data
-@Builder
+@Builder(toBuilder = true)
 @AllArgsConstructor
 @NoArgsConstructor
 public class RegisterRequest {
