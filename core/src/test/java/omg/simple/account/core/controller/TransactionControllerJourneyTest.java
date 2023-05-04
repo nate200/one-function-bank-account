@@ -2,6 +2,7 @@ package omg.simple.account.core.controller;
 
 import omg.simple.account.core.DbTestBase;
 import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -44,7 +45,7 @@ class TransactionControllerJourneyTest extends DbTestBase {
     Account ACC_THB = Account.builder().total(BigDecimal.valueOf(1000.0)).currency("THB").email("thb@bank.haha").build();
     Account ACC_EUR = Account.builder().total(BigDecimal.valueOf(10000.0)).currency("EUR").email("eur@bank.haha").build();
 
-    @AfterEach
+    @BeforeEach
     void resetAccountTable(){
         accRepo.deleteAll();
         tranRepo.deleteAll();
@@ -60,7 +61,7 @@ class TransactionControllerJourneyTest extends DbTestBase {
         long toAccId = accTHB.getId();
         BigDecimal toAccOldBalance = accTHB.getTotal();
 
-        given().auth().oauth2(token)
+        given().header("Authorization", "Bearer " + token)//.auth().oauth2(token)
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
                 .body(Transaction.builder().amount(BigDecimal.valueOf(500.0)).currency("USD").fromAcc(fromAccId).toAcc(toAccId).build())
                 .when().post("/transfer-with-in-app").then()
@@ -82,15 +83,13 @@ class TransactionControllerJourneyTest extends DbTestBase {
     void transferToWithInApp_valid_accountId_invalidTransaction(Transaction badTransaction){
         Account fromAcc = accRepo.save(ACC_EUR.toBuilder().build());
         long fromAccId = fromAcc.getId();
-        BigDecimal fromAccOldBalance = fromAcc.getTotal();
         badTransaction.setFromAcc(fromAccId);
 
         Account toAcc = accRepo.save(ACC_THB.toBuilder().build());
         long toAccId = toAcc.getId();
-        BigDecimal toAccOldBalance = toAcc.getTotal();
         badTransaction.setToAcc(toAccId);
 
-        given().auth().oauth2(token)
+        given().header("Authorization", "Bearer " + token)//.auth().oauth2(token)
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
                 .body(badTransaction)
                 .when().post("/transfer-with-in-app").then()
@@ -106,7 +105,7 @@ class TransactionControllerJourneyTest extends DbTestBase {
         long fromAccId = accEUR.getId();
         long toAccId = accEUR.getId();
 
-        given().auth().oauth2(token)
+        given().header("Authorization", "Bearer " + token)//.auth().oauth2(token)
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
                 .body(Transaction.builder().amount(BigDecimal.valueOf(500.0)).currency("USD").fromAcc(fromAccId).toAcc(toAccId).build())
                 .when().post("/transfer-with-in-app").then()
@@ -129,7 +128,7 @@ class TransactionControllerJourneyTest extends DbTestBase {
         Account toAcc = accRepo.save(ACC_THB.toBuilder().currency("huh??").build());
         long toAccId = toAcc.getId();
 
-        given().auth().oauth2(token)
+        given().header("Authorization", "Bearer " + token)//.auth().oauth2(token)
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
                 .body(Transaction.builder().amount(BigDecimal.valueOf(500.0)).currency("USD").fromAcc(fromAccId).toAcc(toAccId).build())
                 .when().post("/transfer-with-in-app").then()

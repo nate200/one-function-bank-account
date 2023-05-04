@@ -41,7 +41,8 @@ public class AccountControllerJourneyTest extends DbTestBase {
     void createAccount(Account validAccount){
         assertEquals(0,accRepo.count());
 
-        given().auth().oauth2(token)
+        given()
+            .header("Authorization", "Bearer " + token)//.auth().oauth2(token)
             .contentType(MediaType.APPLICATION_JSON_VALUE)
             .body(validAccount)
             .when().post("/create-account").then()
@@ -52,7 +53,7 @@ public class AccountControllerJourneyTest extends DbTestBase {
     @ParameterizedTest
     @MethodSource("omg.simple.account.core.TestDataProvider#badNewAccountRequest")
     void createAccount_invalidAccount(Account invalidAcc){
-        given().auth().oauth2(token)
+        given().header("Authorization", "Bearer " + token)//.auth().oauth2(token)
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
                 .body(invalidAcc)
                 .when().post("/create-account").then()
@@ -63,8 +64,7 @@ public class AccountControllerJourneyTest extends DbTestBase {
     void getAccount(){
         Account expected = accRepo.save(Account.builder().total(TEN).currency("THB").email("admin@admin.com").build());
 
-        Account actual = given().when()
-                .auth().oauth2(token)
+        Account actual = given().when().header("Authorization", "Bearer " + token)//.auth().oauth2(token)
                 .pathParam("accId", expected.getId())
                 .get("/getAccount/{accId}").then()
                 .statusCode(200)
@@ -74,7 +74,7 @@ public class AccountControllerJourneyTest extends DbTestBase {
     }
     @Test
     void getAccount_404(){
-        given().when().auth().oauth2(token)
+        given().when().header("Authorization", "Bearer " + token)//.auth().oauth2(token)
                 .get("/getAccount/-1").then().statusCode(404);
     }
 }
