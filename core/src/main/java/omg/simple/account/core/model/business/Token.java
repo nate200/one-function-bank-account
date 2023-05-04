@@ -5,7 +5,7 @@ import lombok.*;
 import omg.simple.account.core.model.constant.TokenType;
 
 @Data
-@Builder
+@Builder(toBuilder = true)
 @AllArgsConstructor
 @NoArgsConstructor
 
@@ -13,7 +13,7 @@ import omg.simple.account.core.model.constant.TokenType;
 @Table(name = "token")
 public class Token {
     @Id
-    @GeneratedValue//error2 identity can't save null, why??
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     Long id;
 
     @Column(unique = true)
