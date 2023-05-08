@@ -19,18 +19,18 @@ import java.math.BigDecimal;
 public class Account {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    Long id;
+    private Long id;
 
     @Min(0)
     @NotNull
-    BigDecimal total;
+    private BigDecimal total;
 
     @NotNull
-    String currency;
+    private String currency;
 
     @NotNull
     @Email(regexp = "^[A-Za-z0-9+_.-]+@[A-Za-z0-9+_.-]+\\.(.+)$")//simple, for now
-    String email;
+    private String email;
 }
 
 /*CREATE TABLE ACCOUNT (

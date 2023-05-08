@@ -22,24 +22,26 @@ public class Transaction {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "transaction_id")
-    Long transactionId;
+    private Long transactionId;
 
-    String currency;
+    private String currency;
     @Column(name = "from_acc")
-    long fromAcc;
+    private long fromAcc;
     @Column(name = "to_acc")
-    long toAcc;
-    BigDecimal amount;
+    private long toAcc;
+    private BigDecimal amount;
 
     @Enumerated(EnumType.STRING)
-    @NotNull TransactionStatus transaction_status;
+    @NotNull
+    private TransactionStatus transaction_status;
 
-    @NotNull String transaction_result;
+    @NotNull
+    private String transaction_result;
 
     @CreatedDate
     @Temporal(TemporalType.TIMESTAMP)
     @Column(name = "create_time")
-    Date createTime;
+    private Date createTime;
 }
 /*
 CREATE TABLE TRANSACTION (

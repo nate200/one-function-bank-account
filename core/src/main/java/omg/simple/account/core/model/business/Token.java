@@ -14,18 +14,18 @@ import omg.simple.account.core.model.constant.TokenType;
 public class Token {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    Long id;
+    private Long id;
 
     @Column(unique = true)
-    String token;
+    private String token;
 
     @Enumerated(EnumType.STRING)
-    TokenType tokenType;
+    private TokenType tokenType;
 
-    boolean revoked;
-    boolean expired;
+    private boolean revoked;
+    private boolean expired;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name="user_id", referencedColumnName="id")
-    UserAccount user;
+    private UserAccount user;
 }
