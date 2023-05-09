@@ -7,6 +7,7 @@ import io.swagger.v3.oas.annotations.media.ExampleObject;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.security.SecurityScheme;
 import lombok.AllArgsConstructor;
 import omg.simple.account.core.exception.ApiError;
@@ -18,6 +19,7 @@ import omg.simple.account.core.service.AccountService;
 
 @RestController
 @AllArgsConstructor
+@SecurityRequirement(name = "bearerAuth")
 public class AccountController {
     AccountService accountService;
 
