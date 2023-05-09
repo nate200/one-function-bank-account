@@ -23,17 +23,17 @@ import org.springframework.security.core.userdetails.UserDetails;
 public class UserAccount implements UserDetails {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    Long id;
+    private Long id;
 
     @Column(unique=true)
-    String email;
+    private String email;
 
-    String fname;
-    String lname;
-    String passw;
+    private String fname;
+    private String lname;
+    private String passw;
     
     @Enumerated(EnumType.STRING)
-    Role role;
+    private Role role;
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {

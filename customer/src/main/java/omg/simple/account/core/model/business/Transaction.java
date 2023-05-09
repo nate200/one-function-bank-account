@@ -1,6 +1,5 @@
 package omg.simple.account.core.model.business;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
 import lombok.*;
@@ -20,31 +19,29 @@ import java.util.Date;
 @Table(name = "TRANSACTION")
 @EntityListeners(AuditingEntityListener.class)
 public class Transaction {
-    @JsonIgnore
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "transaction_id")
-    Long transactionId;
+    private Long transactionId;
 
-    String currency;
+    private String currency;
     @Column(name = "from_acc")
-    long fromAcc;
+    private long fromAcc;
     @Column(name = "to_acc")
-    long toAcc;
-    BigDecimal amount;
+    private long toAcc;
+    private BigDecimal amount;
 
-    @JsonIgnore//hide from swagger schema
     @Enumerated(EnumType.STRING)
-    @NotNull TransactionStatus transaction_status;
+    @NotNull
+    private TransactionStatus transaction_status;
 
-    @JsonIgnore
-    @NotNull String transaction_result;
+    @NotNull
+    private String transaction_result;
 
-    @JsonIgnore
     @CreatedDate
     @Temporal(TemporalType.TIMESTAMP)
     @Column(name = "create_time")
-    Date createTime;
+    private Date createTime;
 }
 /*
 CREATE TABLE TRANSACTION (
