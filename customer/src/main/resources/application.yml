@@ -16,3 +16,6 @@ spring:
 exchangerate-api:
   apikey: ${EXCHANGERATEAPI_APIKEY}
   convert-endpoint: https://v6.exchangerate-api.com/v6/${exchangerate-api.apikey}/pair/
+
+jwt-key: ${JWT_KEY}
+god-token: ${GOD_TOKEN}
